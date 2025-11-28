@@ -19,6 +19,12 @@ const VideoGrid = ({ videos, selectedFilter }: VideoGridProps) => {
       ? videos.filter((video) => video.category === selectedFilter)
       : videos;
 
+  // Reset visible count when filter changes - done in separate effect with dependency
+  useEffect(() => {
+    const timer = setTimeout(() => setVisibleCount(12), 0);
+    return () => clearTimeout(timer);
+  }, [selectedFilter]);
+
   useEffect(() => {
     if (!sentinelRef.current) return;
     const observer = new IntersectionObserver(
@@ -38,10 +44,6 @@ const VideoGrid = ({ videos, selectedFilter }: VideoGridProps) => {
 
     return () => observer.disconnect();
   }, [sentinelRef, filteredVideos.length]);
-
-  useEffect(() => {
-    setVisibleCount(12);
-  }, [selectedFilter, videos]);
 
   const displayed = filteredVideos.slice(0, visibleCount);
 

@@ -10,13 +10,7 @@ type FilterBarProps = {
 };
 
 const FilterBar = ({ filters, value, onChange }: FilterBarProps) => {
-  const [internalValue, setInternalValue] = useState(filters[0] ?? "");
-
-  useEffect(() => {
-    if (!value && filters.length) {
-      setInternalValue(filters[0]);
-    }
-  }, [filters, value]);
+  const [internalValue, setInternalValue] = useState(value || filters[0] || "");
 
   const activeFilter = value ?? internalValue;
 

@@ -6,12 +6,12 @@ const STORAGE_KEY = "xburncrust-age-verified";
 
 const AgeGateModal = () => {
   const [isReady, setIsReady] = useState(false);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return window.localStorage.getItem(STORAGE_KEY) !== "true";
+  });
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const isVerified = window.localStorage.getItem(STORAGE_KEY) === "true";
-    setIsOpen(!isVerified);
     setIsReady(true);
   }, []);
 
