@@ -1,0 +1,43 @@
+{
+  "name": "lustleak-fr",
+  "version": "1.0.0",
+  "description": "Landing page LustLeak (xburncrust) propulsée par Next.js 15",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:seed": "tsx prisma/seed.ts"
+  },
+  "keywords": [],
+  "author": "xburncrust",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^5.21.1",
+    "clsx": "^2.1.1",
+    "next": "^15.5.6",
+    "prisma": "^5.21.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwind-merge": "^3.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "^22.19.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.22",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "^16.0.5",
+    "postcss": "^8.5.6",
+    "prettier": "^3.7.1",
+    "tailwindcss": "^3.4.18",
+    "tsx": "^4.20.6",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "packageManager": "npm@10.9.0"
+}
