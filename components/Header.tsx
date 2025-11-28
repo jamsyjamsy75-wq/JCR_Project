@@ -28,13 +28,13 @@ const Header = () => {
 
         <nav className="hidden items-center gap-8 text-sm font-semibold uppercase tracking-[0.25em] text-white/80 lg:flex">
           {navItems.map((item) => (
-            <Link
+            <a
               key={item.label}
               href={item.href}
               className="transition hover:text-neon-pink hover:drop-shadow-[0_0_10px_rgba(255,110,199,0.9)]"
             >
               {item.label}
-            </Link>
+            </a>
           ))}
         </nav>
 
