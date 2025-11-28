@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import { formatDuration, formatViews, VideoCardModel, getCloudinaryUrl } from "@/lib/utils";
 
@@ -11,6 +11,7 @@ type VideoCardProps = {
 const VideoCard = ({ video }: VideoCardProps) => {
   const previewRef = useRef<HTMLVideoElement | null>(null);
   const cardRef = useRef<HTMLElement | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   const handlePreviewStart = () => {
     previewRef.current?.play().catch(() => {});
@@ -28,14 +29,16 @@ const VideoCard = ({ video }: VideoCardProps) => {
 
   // Intersection Observer pour démarrer la vidéo quand visible à 50%
   useEffect(() => {
-    if (!cardRef.current || !previewRef.current || !videoPreviewUrl) return;
+    if (!cardRef.current || !videoPreviewUrl) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            setIsVisible(true);
             previewRef.current?.play().catch(() => {});
           } else {
+            setIsVisible(false);
             if (previewRef.current) {
               previewRef.current.pause();
               previewRef.current.currentTime = 0;
@@ -77,7 +80,9 @@ const VideoCard = ({ video }: VideoCardProps) => {
             loop
             preload="metadata"
             poster={coverImageUrl}
-            className="absolute inset-0 h-full w-full object-cover opacity-0 transition duration-500 group-hover:opacity-100"
+            className={`absolute inset-0 h-full w-full object-cover transition duration-500 ${
+              isVisible ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+            }`}
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/80 opacity-0 transition group-hover:opacity-100" />
