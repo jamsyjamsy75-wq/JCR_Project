@@ -21,27 +21,28 @@ export const mediaCategories: MediaCategory[] = [
   { name: "Nouveautés", slug: "nouveautes" },
 ];
 
+// Cloudinary Public IDs (sans extension, utilisés par next-cloudinary)
 const coverPaths = {
-  muse: "/media/Photo_IA/00021-387966325.png",
-  bloom: "/media/Photo_IA/32722bf5-cc39-4ef8-9902-5ad7c0b54531.png",
-  chrome: "/media/Photo_IA/image_comfyui.png",
-  velvet: "/media/Photo_IA/téléchargement (21).jpg",
-  frameA: "/media/Photo_IA/videoframe_1064.png",
-  frameB: "/media/Photo_IA/videoframe_1572.png",
+  muse: "lustleak/media/Photo_IA/00021-387966325",
+  bloom: "lustleak/media/Photo_IA/32722bf5-cc39-4ef8-9902-5ad7c0b54531",
+  chrome: "lustleak/media/Photo_IA/image_comfyui",
+  velvet: "lustleak/media/Photo_IA/krxuhbux4rrvdi4cdujo",
+  frameA: "lustleak/media/Photo_IA/videoframe_1064",
+  frameB: "lustleak/media/Photo_IA/videoframe_1572",
 } as const;
 
 const videoPaths = {
-  neonLux: "/media/Vidéo_IA/Boobs1.mp4",
-  glitchRush: "/media/Vidéo_IA/grok-video-0d3de9c3-9c8c-42f1-a6f8-bd01be929e27 (2).mp4",
-  duoPulse: "/media/Vidéo_IA/grok-video-1ea24980-6370-4907-9084-beed76a14d47-5.mp4",
-  loftHeat: "/media/Vidéo_IA/grok-video-39d8b128-7fb7-4f14-a76d-f4d65f2ab4d2 (1).mp4",
-  chromeDive: "/media/Vidéo_IA/grok-video-6f08d131-cb90-497c-ae00-06e29f555f81.mp4",
-  vrBloom: "/media/Vidéo_IA/grok-video-71b88988-446e-4861-9c70-d313e79a92c9.mp4",
-  latexFlux: "/media/Vidéo_IA/grok-video-c1455632-29db-437d-869c-113540a0f0b5.mp4",
-  neonDuet: "/media/Vidéo_IA/grok-video-cb845b0d-6249-4f52-9d3e-b7575ab4a9f8-4.mp4",
-  sm1: "/media/Vidéo_IA/SM1.mp4",
-  sm2: "/media/Vidéo_IA/SM2.mp4",
-  sm3: "/media/Vidéo_IA/SM3.mp4",
+  neonLux: "lustleak/media/Vidéo_IA/Boobs1",
+  glitchRush: "lustleak/media/Vidéo_IA/grok-video-0d3de9c3-9c8c-42f1-a6f8-bd01be929e27_2",
+  duoPulse: "lustleak/media/Vidéo_IA/grok-video-1ea24980-6370-4907-9084-beed76a14d47-5",
+  loftHeat: "lustleak/media/Vidéo_IA/grok-video-39d8b128-7fb7-4f14-a76d-f4d65f2ab4d2_1",
+  chromeDive: "lustleak/media/Vidéo_IA/grok-video-6f08d131-cb90-497c-ae00-06e29f555f81",
+  vrBloom: "lustleak/media/Vidéo_IA/grok-video-71b88988-446e-4861-9c70-d313e79a92c9",
+  latexFlux: "lustleak/media/Vidéo_IA/grok-video-c1455632-29db-437d-869c-113540a0f0b5",
+  neonDuet: "lustleak/media/Vidéo_IA/grok-video-cb845b0d-6249-4f52-9d3e-b7575ab4a9f8-4",
+  sm1: "lustleak/media/Vidéo_IA/SM1",
+  sm2: "lustleak/media/Vidéo_IA/SM2",
+  sm3: "lustleak/media/Vidéo_IA/SM3",
 } as const;
 
 const trendingPhotos: MediaVideo[] = [
