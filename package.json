@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "db:seed": "tsx prisma/seed.ts",
-    "cloudinary:upload": "tsx scripts/upload-to-cloudinary.ts"
+    "cloudinary:upload": "tsx scripts/upload-to-cloudinary.ts",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "xburncrust",
