@@ -15,7 +15,7 @@ const Header = () => {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
         <div className="flex items-center gap-3 text-white">
           <Image
-            src="/media/XburnCrust2.jpg"
+            src="https://res.cloudinary.com/dbtuww2ie/image/upload/q_auto,f_auto,w_100/lustleak/media/XburnCrust2"
             alt="XBURNCRUST"
             width={42}
             height={42}

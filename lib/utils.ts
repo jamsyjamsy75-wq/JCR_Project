@@ -39,4 +39,21 @@ export type VideoCardModel = {
   ageBadge: string | null;
 };
 
+/**
+ * Construit l'URL Cloudinary complète à partir du Public ID
+ * @param publicId - Le Public ID Cloudinary (ex: "lustleak/media/Photo_IA/image")
+ * @param resourceType - Type de ressource: "image" ou "video"
+ */
+export const getCloudinaryUrl = (
+  publicId: string,
+  resourceType: "image" | "video" = "image"
+): string => {
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dbtuww2ie";
+  const transformations = resourceType === "video" 
+    ? "q_auto,f_auto" 
+    : "q_auto,f_auto,w_800";
+  
+  return `https://res.cloudinary.com/${cloudName}/${resourceType}/upload/${transformations}/${publicId}`;
+};
+
 

@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import Image from "next/image";
-import { formatDuration, formatViews, VideoCardModel } from "@/lib/utils";
+import { formatDuration, formatViews, VideoCardModel, getCloudinaryUrl } from "@/lib/utils";
 
 type VideoCardProps = {
   video: VideoCardModel;
@@ -19,6 +19,10 @@ const VideoCard = ({ video }: VideoCardProps) => {
     previewRef.current.currentTime = 0;
   };
 
+  // Construire les URLs Cloudinary
+  const coverImageUrl = getCloudinaryUrl(video.coverUrl, "image");
+  const videoPreviewUrl = video.videoUrl ? getCloudinaryUrl(video.videoUrl, "video") : null;
+
   return (
     <article
       className="group relative mb-6 break-inside-avoid rounded-3xl border border-white/5 bg-gradient-to-b from-slate-850 to-obsidian shadow-[0_25px_60px_rgba(0,0,0,0.35)] transition hover:-translate-y-2 hover:border-neon-pink/40 hover:shadow-glow"
@@ -27,7 +31,7 @@ const VideoCard = ({ video }: VideoCardProps) => {
     >
       <div className="relative overflow-hidden rounded-t-3xl">
         <Image
-          src={video.coverUrl}
+          src={coverImageUrl}
           alt={video.title}
           width={640}
           height={360}
@@ -35,15 +39,15 @@ const VideoCard = ({ video }: VideoCardProps) => {
           loading="lazy"
           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
         />
-        {video.videoUrl && (
+        {videoPreviewUrl && (
           <video
             ref={previewRef}
-            src={video.videoUrl}
+            src={videoPreviewUrl}
             muted
             playsInline
             loop
             preload="metadata"
-            poster={video.coverUrl}
+            poster={coverImageUrl}
             className="absolute inset-0 h-full w-full object-cover opacity-0 transition duration-500 group-hover:opacity-100"
           />
         )}
