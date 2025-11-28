@@ -1,4 +1,6 @@
-import { useRef } from "react";
+"use client";
+
+import { useRef, useEffect } from "react";
 import Image from "next/image";
 import { formatDuration, formatViews, VideoCardModel, getCloudinaryUrl } from "@/lib/utils";
 
@@ -8,6 +10,7 @@ type VideoCardProps = {
 
 const VideoCard = ({ video }: VideoCardProps) => {
   const previewRef = useRef<HTMLVideoElement | null>(null);
+  const cardRef = useRef<HTMLElement | null>(null);
 
   const handlePreviewStart = () => {
     previewRef.current?.play().catch(() => {});
@@ -23,8 +26,34 @@ const VideoCard = ({ video }: VideoCardProps) => {
   const coverImageUrl = getCloudinaryUrl(video.coverUrl, "image");
   const videoPreviewUrl = video.videoUrl ? getCloudinaryUrl(video.videoUrl, "video") : null;
 
+  // Intersection Observer pour démarrer la vidéo quand visible à 50%
+  useEffect(() => {
+    if (!cardRef.current || !previewRef.current || !videoPreviewUrl) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            previewRef.current?.play().catch(() => {});
+          } else {
+            if (previewRef.current) {
+              previewRef.current.pause();
+              previewRef.current.currentTime = 0;
+            }
+          }
+        });
+      },
+      { threshold: 0.5 } // 50% visible
+    );
+
+    observer.observe(cardRef.current);
+
+    return () => observer.disconnect();
+  }, [videoPreviewUrl]);
+
   return (
     <article
+      ref={cardRef}
       className="group relative mb-6 break-inside-avoid rounded-3xl border border-white/5 bg-gradient-to-b from-slate-850 to-obsidian shadow-[0_25px_60px_rgba(0,0,0,0.35)] transition hover:-translate-y-2 hover:border-neon-pink/40 hover:shadow-glow"
       onMouseEnter={handlePreviewStart}
       onMouseLeave={handlePreviewStop}
