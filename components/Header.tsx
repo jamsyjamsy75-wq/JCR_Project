@@ -52,7 +52,7 @@ const Header = () => {
             Connexion
           </button>
           <button className="rounded-full bg-gradient-to-r from-neon-pink to-red-600 px-5 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-glow transition hover:scale-105">
-            S'inscrire
+            S&apos;inscrire
           </button>
         </div>
 
@@ -102,7 +102,7 @@ const Header = () => {
               Connexion
             </button>
             <button className="rounded-full bg-gradient-to-r from-neon-pink to-red-600 px-4 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-glow transition hover:scale-105">
-              S'inscrire
+              S&apos;inscrire
             </button>
           </div>
         </nav>
