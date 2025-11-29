@@ -1,290 +1,141 @@
-# XBURNCRUST - Plateforme de Contenu IA
+# XBURNCRUST - Plateforme de Streaming pour Adultes
 
-> Landing page moderne propulsée par Next.js 15 avec gestion de médias via Cloudinary
+> Plateforme moderne propulsée par Next.js 15 avec authentification sécurisée et système de favoris
+
+[![Next.js](https://img.shields.io/badge/Next.js-15.5.6-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
+🔗 **Demo** : [project-xburncrust.vercel.app](https://project-xburncrust.vercel.app)
+
+⚠️ **Accès privé** - Réservé aux administrateurs uniquement
+
+---
 
 ## 🚀 Stack Technique
 
-### Frontend
-- **Next.js 15.5.6** - Framework React avec App Router
-- **React 19** - Dernière version avec Server Components
-- **TypeScript 5.6** - Typage statique
-- **Tailwind CSS 3.4** - Styling moderne et responsive
-- **next-cloudinary** - Optimisation automatique des médias
+**Frontend** : Next.js 15 • React 19 • TypeScript • Tailwind CSS  
+**Backend** : Prisma ORM • Turso (SQLite) • NextAuth v5 • API Routes  
+**Médias** : Cloudinary CDN • Optimisation WebP/AVIF  
+**Hosting** : Vercel Edge Network
 
-### Backend & Database
-- **Prisma ORM 5.21** - Gestion de la base de données
-- **SQLite** - Base de données locale (dev)
-- **Next.js API Routes** - Endpoints RESTful
 
-### Médias & Assets
-- **Cloudinary** - CDN et optimisation d'images/vidéos
-- **20 fichiers** uploadés (34 MB)
-- **Transformations automatiques** (format, qualité, taille)
 
-### DevOps
-- **Vercel** - Hébergement et déploiement automatique
-- **GitHub** - Gestion de code et CI/CD
-- **Git** - Contrôle de version
+## ✨ Fonctionnalités Principales
 
----
+### 🔐 Authentification
+- **Protection admin** - Middleware bloque l'accès non-autorisé
+- **NextAuth v5** - JWT avec hash bcrypt
+- **Toggle password** - Icône œil sur formulaires
+- **Rôles** - Admin / User
 
-## 📁 Structure du Projet
+### 🎬 Vidéos & Médias
+- **Favoris** - Système de likes avec API REST
+- **Autoplay intelligent** - Démarre à 50% de visibilité
+- **Hover preview** - Aperçu au survol
+- **Filtres** - Par catégorie
+- **CDN Cloudinary** - Optimisation auto (WebP/AVIF)
 
-```
-lustleak-fr/
-├── app/                      # Next.js App Router
-│   ├── layout.tsx           # Layout principal
-│   ├── page.tsx             # Page d'accueil
-│   ├── globals.css          # Styles globaux
-│   └── api/                 # API Routes
-│       ├── categories/      # Endpoint catégories
-│       └── videos/          # Endpoint vidéos
-├── components/              # Composants React
-│   ├── Header.tsx           # Header avec menu burger
-│   ├── VideoCard.tsx        # Card vidéo avec autoplay
-│   ├── VideoGrid.tsx        # Grille de vidéos
-│   ├── FilterBar.tsx        # Barre de filtres
-│   ├── HeroVideo.tsx        # Hero section
-│   ├── AgeGateModal.tsx     # Modal de vérification d'âge
-│   └── Footer.tsx           # Footer
-├── lib/                     # Utilitaires
-│   ├── prisma.ts           # Client Prisma
-│   ├── utils.ts            # Fonctions utilitaires
-│   └── mediaCatalog.ts     # Catalogue de médias
-├── prisma/                  # Configuration Prisma
-│   ├── schema.prisma       # Schéma de la DB
-│   ├── seed.ts             # Script de seed
-│   └── migrations/         # Migrations
-├── scripts/                 # Scripts utilitaires
-│   ├── upload-to-cloudinary.ts
-│   └── cloudinary-mapping.json
-└── public/                  # Assets statiques
-```
+### 🎨 Interface
+- **Responsive** - Mobile, tablette, desktop
+- **Dark mode** - Thème neon-pink
+- **Modal âge** - Vérification avec localStorage
 
 ---
 
-## 🎨 Fonctionnalités
-
-### Interface Utilisateur
-- ✅ **Design responsive** (mobile, tablet, desktop)
-- ✅ **Menu burger** pour mobile (< 768px)
-- ✅ **Dark mode** par défaut
-- ✅ **Animations fluides** avec Tailwind
-- ✅ **Modal de vérification d'âge**
-
-### Vidéos & Médias
-- ✅ **Autoplay intelligent** : vidéo démarre quand visible à 50%
-- ✅ **Hover preview** : aperçu vidéo au survol
-- ✅ **Lazy loading** : chargement progressif
-- ✅ **Optimisation Cloudinary** : format/qualité auto
-
-### Performance
-- ✅ **Images optimisées** via Cloudinary CDN
-- ✅ **Server Components** React 19
-- ✅ **Streaming adaptatif** pour les vidéos
-- ✅ **Build time < 10s**
-
----
-
-## 🛠️ Installation & Développement
-
-### Prérequis
-- Node.js ≥ 18.18.0
-- npm 10.9.0
-- Compte Cloudinary (gratuit)
-
-### Installation
+## 🛠️ Installation
 
 ```bash
-# Cloner le repo
+# Cloner et installer
 git clone https://github.com/jamsyjamsy75-wq/JCR_Project.git
 cd lustleak-fr
-
-# Installer les dépendances
 npm install
 
-# Configurer les variables d'environnement
-cp .env.local.example .env.local
-# Remplir avec vos credentials Cloudinary
-```
-
-### Variables d'environnement
-
-```env
+# Configurer .env.local
+AUTH_SECRET=xxx                    # openssl rand -base64 32
+AUTH_URL=http://localhost:3000
 DATABASE_URL="file:./dev.db"
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_CLOUD_NAME=xxx
+CLOUDINARY_API_KEY=xxx
+CLOUDINARY_API_SECRET=xxx
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=xxx
+
+# Setup database
+npx prisma generate
+npx prisma migrate dev
+npm run db:seed
+
+# Lancer
+npm run dev  # http://localhost:3000
 ```
 
-### Commandes
+## 🌐 Déploiement Vercel
 
-```bash
-# Développement
-npm run dev                    # Lance le serveur dev sur http://localhost:3000
-
-# Database
-npm run db:seed               # Seed la base de données
-
-# Cloudinary
-npm run cloudinary:upload     # Upload les médias vers Cloudinary
-
-# Production
-npm run build                 # Build pour la production
-npm start                     # Lance le serveur de production
+### Variables d'environnement requises
+```env
+AUTH_SECRET=xxx                              # CRITIQUE pour NextAuth
+AUTH_URL=https://project-xburncrust.vercel.app
+TURSO_DATABASE_URL=libsql://xxx.turso.io
+TURSO_AUTH_TOKEN=xxx
+CLOUDINARY_CLOUD_NAME=xxx
+CLOUDINARY_API_KEY=xxx
+CLOUDINARY_API_SECRET=xxx
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=xxx
+NEXT_PUBLIC_USE_LOCAL_MEDIA=false
 ```
+
+Push sur GitHub → Déploiement auto (2-3 min)
 
 ---
 
-## 🌐 Déploiement
+## 📊 Schema Database
 
-### Déploiement Vercel (Actuel)
+**User** : id, email, password (hashed), role (admin/user)  
+**Video** : id, title, coverUrl, videoUrl, duration, views, categoryId  
+**Category** : id, name, slug  
+**Favorite** : userId + videoId (unique)  
+**Session** : NextAuth JWT
 
-**URL Production** : `https://project-xburncrust.vercel.app`
 
-#### Configuration automatique
-1. Push vers GitHub → Déploiement auto
-2. Build time : ~2-3 minutes
-3. Variables d'environnement configurées dans Vercel Dashboard
-
-#### Variables Vercel requises
-```
-DATABASE_URL=file:./dev.db
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=dbtuww2ie
-```
-
-### Workflow de déploiement
-
-```
-Developer → Git Push → GitHub
-                         ↓
-                    Vercel Webhook
-                         ↓
-                    Build (2-3 min)
-                    - npm install
-                    - prisma generate
-                    - next build
-                         ↓
-                    Deploy → CDN
-                         ↓
-                Production Live ✅
-```
-
----
-
-## 📊 Modèles de Données
-
-### Category
-```typescript
-{
-  id: number
-  name: string
-  slug: string
-  videos: Video[]
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-```
-
-### Video
-```typescript
-{
-  id: string
-  title: string
-  duration: number
-  views: number
-  isHd: boolean
-  coverUrl: string      // Cloudinary Public ID
-  videoUrl: string?     // Cloudinary Public ID
-  performer: string
-  ageBadge: string?
-  categoryId: number
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-```
-
----
-
-## 🎯 Optimisations Cloudinary
-
-### Images
-- Format automatique : WebP/AVIF
-- Qualité : auto
-- Responsive : 800px max width
-- Lazy loading
-
-### Vidéos
-- Streaming adaptatif
-- Qualité auto
-- Format auto (MP4/WebM)
-- Préchargement metadata
-
----
-
-## 📦 Dépendances Principales
-
-```json
-{
-  "next": "^15.5.6",
-  "react": "^19.2.0",
-  "prisma": "^5.21.1",
-  "cloudinary": "^2.8.0",
-  "next-cloudinary": "^7.1.0",
-  "tailwindcss": "^3.4.18",
-  "typescript": "^5.6.3"
-}
-```
-
----
 
 ## 🔒 Sécurité
 
-- ✅ HTTPS automatique via Vercel
-- ✅ Headers de sécurité (X-Frame-Options, CSP)
-- ✅ Variables d'environnement sécurisées
-- ✅ Validation des entrées utilisateur
-- ✅ Modal de vérification d'âge avec localStorage
-
----
-
-## 📈 Métriques
-
-### Performance
-- **Lighthouse Score** : 90+
-- **First Contentful Paint** : < 1.5s
-- **Time to Interactive** : < 3s
-
-### Hébergement Gratuit
-- **Vercel Hobby** : 100 GB bandwidth/mois
-- **Cloudinary Free** : 25 GB stockage + 25 GB bandwidth/mois
-- **Coût total** : 0€/mois
+- **Middleware** - Routes protégées (sauf `/auth/*`)
+- **Rôle admin requis** - Users bloqués automatiquement
+- **JWT NextAuth v5** - Sessions sécurisées
+- **Bcrypt** - Hash password (salt 10)
+- **HTTPS Vercel** - Certificat auto
+- **Modal âge** - Vérification obligatoire
 
 ---
 
 ## 👨‍💻 Auteur
 
-**xburncrust** (Jamal)
-- GitHub: [@jamsyjamsy75-wq](https://github.com/jamsyjamsy75-wq)
-- Projet: JCR_Project
+**xburncrust** - [@jamsyjamsy75-wq](https://github.com/jamsyjamsy75-wq)
+
+**License** : MIT
 
 ---
 
-## 📝 License
+*Dernière mise à jour : 29 novembre 2025*
 
-MIT License - Voir le fichier LICENSE
+## 🔧 Accès Admin
+
+**Inscription ouverte** mais seul `role = "admin"` accède au contenu.
+
+```bash
+# Scripts utilitaires
+node make-admin.js        # Promouvoir un user en admin
+node check-turso.js       # Vérifier la database
+node reset-password.js    # Reset password
+```
 
 ---
 
-## 🆘 Support
+## 📝 Limitations
 
-Pour toute question ou problème :
-- Créer une issue sur GitHub
-- Consulter la [documentation Next.js](https://nextjs.org/docs)
-- Consulter la [documentation Cloudinary](https://cloudinary.com/documentation)
-- Consulter la [documentation Vercel](https://vercel.com/docs)
+- OAuth Google/GitHub désactivé en prod
+- Upload vidéos via scripts uniquement
+- Contenu statique (seedé manuellement)
 
 ---
-
-**Dernière mise à jour** : 28 novembre 2025
