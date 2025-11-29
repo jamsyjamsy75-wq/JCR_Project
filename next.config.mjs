@@ -1,7 +1,8 @@
 /** @type {import("next").NextConfig} */
 const nextConfig = {
+  typedRoutes: true,
+  serverExternalPackages: ['@libsql/client', '@prisma/adapter-libsql'],
   experimental: {
-    typedRoutes: true,
     turbo: {
       rules: {
         "*.ts": {
@@ -9,7 +10,6 @@ const nextConfig = {
         },
       },
     },
-    serverComponentsExternalPackages: ['@libsql/client', '@prisma/adapter-libsql'],
   },
   images: {
     remotePatterns: [
