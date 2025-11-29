@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
 
 const navItems = [
   { label: "Accueil", href: "#hero" },
@@ -12,6 +14,7 @@ const navItems = [
 ];
 
 const Header = () => {
+  const { data: session, status } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -48,12 +51,42 @@ const Header = () => {
 
         {/* Desktop Buttons */}
         <div className="hidden items-center gap-3 lg:flex">
-          <button className="rounded-full border border-white/20 px-5 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-white transition hover:border-neon-pink hover:text-neon-pink hover:shadow-glow">
-            Connexion
-          </button>
-          <button className="rounded-full bg-gradient-to-r from-neon-pink to-red-600 px-5 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-glow transition hover:scale-105">
-            S&apos;inscrire
-          </button>
+          {status === "loading" ? (
+            <div className="h-10 w-32 animate-pulse rounded-full bg-white/10" />
+          ) : session ? (
+            <>
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 rounded-full border border-white/20 px-5 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-white transition hover:border-neon-pink hover:text-neon-pink hover:shadow-glow"
+              >
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-neon-pink to-red-600 text-xs font-bold">
+                  {session.user.name?.[0] || session.user.email?.[0] || "U"}
+                </div>
+                Profil
+              </Link>
+              <button
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="rounded-full border border-white/20 px-5 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-white transition hover:border-red-500 hover:text-red-500"
+              >
+                Déconnexion
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/auth/login"
+                className="rounded-full border border-white/20 px-5 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-white transition hover:border-neon-pink hover:text-neon-pink hover:shadow-glow"
+              >
+                Connexion
+              </Link>
+              <Link
+                href="/auth/signup"
+                className="rounded-full bg-gradient-to-r from-neon-pink to-red-600 px-5 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-glow transition hover:scale-105"
+              >
+                S&apos;inscrire
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Burger Button */}
@@ -98,12 +131,45 @@ const Header = () => {
             </a>
           ))}
           <div className="mt-4 flex flex-col gap-3">
-            <button className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-white transition hover:border-neon-pink hover:text-neon-pink">
-              Connexion
-            </button>
-            <button className="rounded-full bg-gradient-to-r from-neon-pink to-red-600 px-4 py-2 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-glow transition hover:scale-105">
-              S&apos;inscrire
-            </button>
+            {status === "loading" ? (
+              <div className="h-10 animate-pulse rounded-full bg-white/10" />
+            ) : session ? (
+              <>
+                <Link
+                  href="/profile"
+                  onClick={closeMenu}
+                  className="rounded-full border border-white/20 px-4 py-2 text-center text-sm font-semibold uppercase tracking-[0.25em] text-white transition hover:border-neon-pink hover:text-neon-pink"
+                >
+                  Mon Profil
+                </Link>
+                <button
+                  onClick={() => {
+                    closeMenu();
+                    signOut({ callbackUrl: "/" });
+                  }}
+                  className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-white transition hover:border-red-500 hover:text-red-500"
+                >
+                  Déconnexion
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  onClick={closeMenu}
+                  className="rounded-full border border-white/20 px-4 py-2 text-center text-sm font-semibold uppercase tracking-[0.25em] text-white transition hover:border-neon-pink hover:text-neon-pink"
+                >
+                  Connexion
+                </Link>
+                <Link
+                  href="/auth/signup"
+                  onClick={closeMenu}
+                  className="rounded-full bg-gradient-to-r from-neon-pink to-red-600 px-4 py-2 text-center text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-glow transition hover:scale-105"
+                >
+                  S&apos;inscrire
+                </Link>
+              </>
+            )}
           </div>
         </nav>
       </div>

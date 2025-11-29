@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Bebas_Neue, Inter } from "next/font/google";
+import AuthProvider from "@/components/AuthProvider";
 import "./globals.css";
 
 const display = Bebas_Neue({
@@ -112,7 +113,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
             __html: JSON.stringify(structuredData),
           }}
         />
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
