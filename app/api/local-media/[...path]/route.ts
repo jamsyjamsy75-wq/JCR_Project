@@ -4,17 +4,19 @@ import path from "path";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
   // Seulement en développement
   if (process.env.NODE_ENV !== "development") {
     return new NextResponse("Not available in production", { status: 404 });
   }
 
+  const { path: pathSegments } = await params;
+  
   const filePath = path.join(
     process.cwd(),
     "local-media",
-    ...params.path
+    ...pathSegments
   );
 
   try {
