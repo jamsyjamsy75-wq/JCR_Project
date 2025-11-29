@@ -34,13 +34,9 @@ export async function POST(request: NextRequest) {
   try {
     const session = await auth();
 
-    console.log("POST /api/favorites - Session:", JSON.stringify(session, null, 2));
-    console.log("POST /api/favorites - session.user:", session?.user);
-    console.log("POST /api/favorites - session.user.id:", (session?.user as any)?.id);
-
     if (!session?.user) {
       return NextResponse.json(
-        { error: "Unauthorized - No session" },
+        { error: "Unauthorized" },
         { status: 401 }
       );
     }
@@ -48,7 +44,7 @@ export async function POST(request: NextRequest) {
     const userId = (session.user as any).id;
     if (!userId) {
       return NextResponse.json(
-        { error: "Unauthorized - No user ID in session" },
+        { error: "Unauthorized" },
         { status: 401 }
       );
     }
