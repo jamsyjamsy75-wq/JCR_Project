@@ -1,16 +1,24 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useState, FormEvent, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const errorParam = searchParams.get("error");
+    if (errorParam === "unauthorized") {
+      setError("⚠️ Accès réservé aux administrateurs uniquement");
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
