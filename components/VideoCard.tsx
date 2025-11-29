@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 import { formatDuration, formatViews, VideoCardModel, getCloudinaryUrl } from "@/lib/utils";
 
 type VideoCardProps = {
@@ -12,6 +13,9 @@ const VideoCard = ({ video }: VideoCardProps) => {
   const previewRef = useRef<HTMLVideoElement | null>(null);
   const cardRef = useRef<HTMLElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { data: session } = useSession();
 
   const handlePreviewStart = () => {
     previewRef.current?.play().catch(() => {});
@@ -27,6 +31,18 @@ const VideoCard = ({ video }: VideoCardProps) => {
   const coverImageUrl = getCloudinaryUrl(video.coverUrl, "image");
   const videoPreviewUrl = video.videoUrl ? getCloudinaryUrl(video.videoUrl, "video") : null;
   const isLocalMedia = coverImageUrl.startsWith("/api/local-media");
+
+  // Charger l'état des favoris
+  useEffect(() => {
+    if (!session?.user) return;
+
+    fetch("/api/favorites")
+      .then((res) => res.json())
+      .then((data) => {
+        setIsFavorite(data.favoriteIds?.includes(video.id) || false);
+      })
+      .catch(() => {});
+  }, [session, video.id]);
 
   // Intersection Observer pour démarrer la vidéo quand visible à 50%
   useEffect(() => {
@@ -54,6 +70,46 @@ const VideoCard = ({ video }: VideoCardProps) => {
 
     return () => observer.disconnect();
   }, [videoPreviewUrl]);
+
+  const toggleFavorite = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!session?.user) {
+      window.location.href = "/auth/login";
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      if (isFavorite) {
+        // Retirer des favoris
+        const res = await fetch(`/api/favorites?videoId=${video.id}`, {
+          method: "DELETE",
+        });
+
+        if (res.ok) {
+          setIsFavorite(false);
+        }
+      } else {
+        // Ajouter aux favoris
+        const res = await fetch("/api/favorites", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ videoId: video.id }),
+        });
+
+        if (res.ok) {
+          setIsFavorite(true);
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <article
@@ -121,6 +177,40 @@ const VideoCard = ({ video }: VideoCardProps) => {
             {formatViews(video.views)} vues
           </span>
         </div>
+        
+        {/* Bouton Favori */}
+        <button
+          onClick={toggleFavorite}
+          disabled={isLoading}
+          className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition hover:scale-110 hover:bg-neon-pink/80 disabled:opacity-50"
+          aria-label={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
+        >
+          {isFavorite ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="h-5 w-5 text-neon-pink"
+            >
+              <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="h-5 w-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+              />
+            </svg>
+          )}
+        </button>
       </div>
       <div className="space-y-2 px-5 py-6">
         <p className="text-[10px] uppercase tracking-[0.6em] text-neon-pink">
