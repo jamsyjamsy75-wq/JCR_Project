@@ -37,8 +37,10 @@ function LoginForm() {
         return;
       }
 
-      router.push("/");
-      router.refresh();
+      if (result?.ok) {
+        // Forcer le rechargement complet pour que le middleware prenne en compte la session
+        window.location.href = "/";
+      }
     } catch (err) {
       setError("Une erreur est survenue");
     } finally {
