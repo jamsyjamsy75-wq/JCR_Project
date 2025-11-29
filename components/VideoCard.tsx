@@ -23,9 +23,10 @@ const VideoCard = ({ video }: VideoCardProps) => {
     previewRef.current.currentTime = 0;
   };
 
-  // Construire les URLs Cloudinary
+  // Construire les URLs Cloudinary ou locales
   const coverImageUrl = getCloudinaryUrl(video.coverUrl, "image");
   const videoPreviewUrl = video.videoUrl ? getCloudinaryUrl(video.videoUrl, "video") : null;
+  const isLocalMedia = coverImageUrl.startsWith("/api/local-media");
 
   // Intersection Observer pour démarrer la vidéo quand visible à 50%
   useEffect(() => {
@@ -62,15 +63,24 @@ const VideoCard = ({ video }: VideoCardProps) => {
       onMouseLeave={handlePreviewStop}
     >
       <div className="relative overflow-hidden rounded-t-3xl">
-        <Image
-          src={coverImageUrl}
-          alt={video.title}
-          width={640}
-          height={360}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
-          loading="lazy"
-          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
-        />
+        {isLocalMedia ? (
+          <img
+            src={coverImageUrl}
+            alt={video.title}
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+            loading="lazy"
+          />
+        ) : (
+          <Image
+            src={coverImageUrl}
+            alt={video.title}
+            width={640}
+            height={360}
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+            loading="lazy"
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
+          />
+        )}
         {videoPreviewUrl && (
           <video
             ref={previewRef}
