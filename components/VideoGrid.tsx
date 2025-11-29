@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import VideoCard from "./VideoCard";
 import LoadMoreButton from "./LoadMoreButton";
 import type { VideoCardModel } from "@/lib/utils";
@@ -12,12 +13,29 @@ type VideoGridProps = {
 
 const VideoGrid = ({ videos, selectedFilter }: VideoGridProps) => {
   const [visibleCount, setVisibleCount] = useState(12);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const { data: session } = useSession();
 
   const filteredVideos =
     selectedFilter && selectedFilter !== "Trending"
       ? videos.filter((video) => video.category === selectedFilter)
       : videos;
+
+  // Charger les favoris UNE SEULE FOIS pour toutes les vidéos
+  useEffect(() => {
+    if (!session?.user) {
+      setFavoriteIds([]);
+      return;
+    }
+
+    fetch("/api/favorites")
+      .then((res) => res.json())
+      .then((data) => {
+        setFavoriteIds(data.favoriteIds || []);
+      })
+      .catch(() => setFavoriteIds([]));
+  }, [session]);
 
   // Reset visible count when filter changes - done in separate effect with dependency
   useEffect(() => {
@@ -51,11 +69,47 @@ const VideoGrid = ({ videos, selectedFilter }: VideoGridProps) => {
     setVisibleCount((prev) => Math.min(prev + 8, filteredVideos.length));
   };
 
+  const handleToggleFavorite = async (videoId: string) => {
+    if (!session?.user) {
+      window.location.href = "/auth/login";
+      return;
+    }
+
+    const isFavorite = favoriteIds.includes(videoId);
+
+    try {
+      if (isFavorite) {
+        const res = await fetch(`/api/favorites?videoId=${videoId}`, {
+          method: "DELETE",
+        });
+        if (res.ok) {
+          setFavoriteIds((prev) => prev.filter((id) => id !== videoId));
+        }
+      } else {
+        const res = await fetch("/api/favorites", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ videoId }),
+        });
+        if (res.ok) {
+          setFavoriteIds((prev) => [...prev, videoId]);
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
+  };
+
   return (
     <section className="space-y-10">
       <div className="columns-1 gap-6 sm:columns-2 lg:columns-3 xl:columns-4">
         {displayed.map((video) => (
-          <VideoCard key={video.id} video={video} />
+          <VideoCard
+            key={video.id}
+            video={video}
+            isFavorite={favoriteIds.includes(video.id)}
+            onToggleFavorite={handleToggleFavorite}
+          />
         ))}
       </div>
       {visibleCount < filteredVideos.length && (

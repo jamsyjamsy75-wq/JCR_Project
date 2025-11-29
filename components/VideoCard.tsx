@@ -2,20 +2,19 @@
 
 import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
-import { useSession } from "next-auth/react";
 import { formatDuration, formatViews, VideoCardModel, getCloudinaryUrl } from "@/lib/utils";
 
 type VideoCardProps = {
   video: VideoCardModel;
+  isFavorite?: boolean;
+  onToggleFavorite?: (videoId: string) => void;
 };
 
-const VideoCard = ({ video }: VideoCardProps) => {
+const VideoCard = ({ video, isFavorite = false, onToggleFavorite }: VideoCardProps) => {
   const previewRef = useRef<HTMLVideoElement | null>(null);
   const cardRef = useRef<HTMLElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { data: session } = useSession();
 
   const handlePreviewStart = () => {
     previewRef.current?.play().catch(() => {});
@@ -31,18 +30,6 @@ const VideoCard = ({ video }: VideoCardProps) => {
   const coverImageUrl = getCloudinaryUrl(video.coverUrl, "image");
   const videoPreviewUrl = video.videoUrl ? getCloudinaryUrl(video.videoUrl, "video") : null;
   const isLocalMedia = coverImageUrl.startsWith("/api/local-media");
-
-  // Charger l'état des favoris
-  useEffect(() => {
-    if (!session?.user) return;
-
-    fetch("/api/favorites")
-      .then((res) => res.json())
-      .then((data) => {
-        setIsFavorite(data.favoriteIds?.includes(video.id) || false);
-      })
-      .catch(() => {});
-  }, [session, video.id]);
 
   // Intersection Observer pour démarrer la vidéo quand visible à 50%
   useEffect(() => {
@@ -75,40 +62,11 @@ const VideoCard = ({ video }: VideoCardProps) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (!session?.user) {
-      window.location.href = "/auth/login";
-      return;
-    }
+    if (!onToggleFavorite) return;
 
     setIsLoading(true);
-
-    try {
-      if (isFavorite) {
-        // Retirer des favoris
-        const res = await fetch(`/api/favorites?videoId=${video.id}`, {
-          method: "DELETE",
-        });
-
-        if (res.ok) {
-          setIsFavorite(false);
-        }
-      } else {
-        // Ajouter aux favoris
-        const res = await fetch("/api/favorites", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ videoId: video.id }),
-        });
-
-        if (res.ok) {
-          setIsFavorite(true);
-        }
-      }
-    } catch (error) {
-      console.error("Error toggling favorite:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    await onToggleFavorite(video.id);
+    setIsLoading(false);
   };
 
   return (
