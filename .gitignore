@@ -12,3 +12,6 @@ node_modules
 
 # Cloudinary credentials
 scripts/cloudinary-mapping.json
+
+# Local media files (dev only)
+/local-media
