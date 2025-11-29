@@ -2,25 +2,8 @@ const HeroVideo = () => {
   return (
     <section
       id="hero"
-      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-night"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-night via-obsidian to-night"
     >
-      <video
-        className="absolute inset-0 h-full w-full object-cover"
-        autoPlay
-        loop
-        muted
-        playsInline
-        poster="https://res.cloudinary.com/demo/image/upload/v1720000000/xburncrust/hero-poster.webp"
-      >
-        <source
-          src="https://res.cloudinary.com/demo/video/upload/q_auto,f_auto/v1720000000/xburncrust/hero-loop.mp4"
-          type="video/mp4"
-        />
-        <source
-          src="https://res.cloudinary.com/demo/video/upload/q_auto,f_auto/v1720000000/xburncrust/hero-loop.webm"
-          type="video/webm"
-        />
-      </video>
 
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-night" />
       <div className="absolute inset-0 bg-grid opacity-40" />
