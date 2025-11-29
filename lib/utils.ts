@@ -48,10 +48,10 @@ export const getCloudinaryUrl = (
   publicId: string,
   resourceType: "image" | "video" = "image"
 ): string => {
-  // En développement local, utiliser les fichiers du dossier public
-  const isDev = process.env.NODE_ENV === "development";
+  // Utiliser les fichiers locaux si la variable est définie
+  const useLocalMedia = process.env.NEXT_PUBLIC_USE_LOCAL_MEDIA === "true";
   
-  if (isDev) {
+  if (useLocalMedia) {
     // Extraire le nom du fichier depuis le Public ID Cloudinary
     // Format: "lustleak/media/Photo_IA/filename" ou "lustleak/media/Vidéo_IA/filename"
     const cloudinaryFileName = publicId.split("/").pop() || publicId;
