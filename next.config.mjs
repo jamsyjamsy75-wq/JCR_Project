@@ -9,6 +9,7 @@ const nextConfig = {
         },
       },
     },
+    serverComponentsExternalPackages: ['@libsql/client', '@prisma/adapter-libsql'],
   },
   images: {
     remotePatterns: [
@@ -18,20 +19,17 @@ const nextConfig = {
     ],
     formats: ["image/avif", "image/webp"],
   },
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      // Exclure les fichiers non-JS des packages libsql
-      config.externals.push({
-        '@libsql/client': '@libsql/client',
-        '@prisma/adapter-libsql': '@prisma/adapter-libsql',
-      });
-    }
-    
-    // Ignorer les fichiers README/LICENSE dans le bundling
+  webpack: (config) => {
+    // Ignorer les fichiers non-code dans le bundling
     config.module.rules.push({
-      test: /\.(md|txt|LICENSE)$/,
+      test: /\.(md|txt)$/,
       type: 'asset/source',
     });
+    
+    config.ignoreWarnings = [
+      { module: /node_modules\/@libsql/ },
+      { module: /node_modules\/@prisma\/adapter-libsql/ },
+    ];
     
     return config;
   },
