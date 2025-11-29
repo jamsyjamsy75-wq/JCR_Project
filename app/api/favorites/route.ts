@@ -7,12 +7,17 @@ export async function GET(request: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user?.id) {
+    if (!session?.user) {
+      return NextResponse.json({ favoriteIds: [] });
+    }
+
+    const userId = (session.user as any).id;
+    if (!userId) {
       return NextResponse.json({ favoriteIds: [] });
     }
 
     const favorites = await prisma.favorite.findMany({
-      where: { userId: session.user.id },
+      where: { userId },
       select: { videoId: true },
     });
 
@@ -29,9 +34,21 @@ export async function POST(request: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user?.id) {
+    console.log("POST /api/favorites - Session:", JSON.stringify(session, null, 2));
+    console.log("POST /api/favorites - session.user:", session?.user);
+    console.log("POST /api/favorites - session.user.id:", (session?.user as any)?.id);
+
+    if (!session?.user) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized - No session" },
+        { status: 401 }
+      );
+    }
+
+    const userId = (session.user as any).id;
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Unauthorized - No user ID in session" },
         { status: 401 }
       );
     }
@@ -61,7 +78,7 @@ export async function POST(request: NextRequest) {
     const existingFavorite = await prisma.favorite.findUnique({
       where: {
         userId_videoId: {
-          userId: session.user.id,
+          userId,
           videoId,
         },
       },
@@ -77,7 +94,7 @@ export async function POST(request: NextRequest) {
     // Ajouter aux favoris
     await prisma.favorite.create({
       data: {
-        userId: session.user.id,
+        userId,
         videoId,
       },
     });
@@ -100,9 +117,17 @@ export async function DELETE(request: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user?.id) {
+    if (!session?.user) {
       return NextResponse.json(
         { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const userId = (session.user as any).id;
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Unauthorized - No user ID" },
         { status: 401 }
       );
     }
@@ -120,7 +145,7 @@ export async function DELETE(request: NextRequest) {
     await prisma.favorite.delete({
       where: {
         userId_videoId: {
-          userId: session.user.id,
+          userId,
           videoId,
         },
       },
