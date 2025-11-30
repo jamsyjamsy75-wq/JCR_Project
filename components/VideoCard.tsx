@@ -27,11 +27,11 @@ const VideoCard = ({ video, isFavorite = false, onToggleFavorite }: VideoCardPro
   };
 
   // Construire les URLs Cloudinary ou locales
-  // Pour les vidéos (videoUrl existe), utiliser video/upload pour générer la miniature automatiquement
-  // Pour les photos (videoUrl null), utiliser image/upload
+  // Détecter le type basé sur le chemin du coverUrl (Photo_IA vs Vidéo_IA)
+  const isVideoMedia = video.coverUrl.includes("Vidéo_IA") || video.coverUrl.includes("Video_IA");
   const coverImageUrl = getCloudinaryUrl(
     video.coverUrl,
-    video.videoUrl ? "video" : "image"
+    isVideoMedia ? "video" : "image"
   );
   const videoPreviewUrl = video.videoUrl ? getCloudinaryUrl(video.videoUrl, "video") : null;
   const isLocalMedia = coverImageUrl.startsWith("/api/local-media");
