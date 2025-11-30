@@ -232,7 +232,7 @@ export default function AdminMediaPage() {
             onClick={() => router.push("/")}
             className="rounded-lg bg-night-lighter px-4 py-2 text-white transition hover:bg-neon-pink"
           >
-            ← Retour à l'accueil
+            ← Retour à l&apos;accueil
           </button>
         </div>
 
