@@ -419,10 +419,10 @@ export default function AdminMediaPage() {
                 <tr>
                   <th className="pb-3">Aperçu</th>
                   <th className="pb-3">Titre</th>
-                  <th className="pb-3">Type</th>
+                  <th className="pb-3">Upload date/heure</th>
                   <th className="pb-3">Catégorie</th>
+                  <th className="pb-3">Type</th>
                   <th className="pb-3">Vues</th>
-                  <th className="pb-3">Date</th>
                   <th className="pb-3">Actions</th>
                 </tr>
               </thead>
@@ -444,7 +444,7 @@ export default function AdminMediaPage() {
                         />
                       </div>
                     </td>
-                    <td className="py-4">{media.views}</td>
+                    <td className="py-4">{media.title}</td>
                     <td className="py-4 text-sm text-white/60">
                       {new Date(media.createdAt).toLocaleDateString('fr-FR', {
                         day: '2-digit',
@@ -454,6 +454,7 @@ export default function AdminMediaPage() {
                         minute: '2-digit'
                       })}
                     </td>
+                    <td className="py-4">{media.category.name}</td>
                     <td className="py-4">
                       <span
                         className={`rounded px-2 py-1 text-xs ${
@@ -465,7 +466,6 @@ export default function AdminMediaPage() {
                         {media.type}
                       </span>
                     </td>
-                    <td className="py-4">{media.category.name}</td>
                     <td className="py-4">{media.views.toLocaleString()}</td>
                     <td className="py-4">
                       <button
