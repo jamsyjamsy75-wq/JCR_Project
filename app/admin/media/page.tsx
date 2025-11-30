@@ -301,7 +301,7 @@ export default function AdminMediaPage() {
 
               <div>
                 <label className="mb-2 block text-sm text-white/70">
-                  Badge d'âge
+                  Badge d&apos;âge
                 </label>
                 <input
                   type="text"
