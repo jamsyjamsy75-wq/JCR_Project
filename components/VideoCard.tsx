@@ -117,11 +117,6 @@ const VideoCard = ({ video, isFavorite = false, onToggleFavorite }: VideoCardPro
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/80 opacity-0 transition group-hover:opacity-100" />
         <div className="absolute left-4 top-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.4em]">
-          {video.isHd && (
-            <span className="rounded-full bg-black/80 px-3 py-1 text-white">
-              4K
-            </span>
-          )}
           {video.ageBadge && (
             <span className="rounded-full bg-neon-pink/80 px-3 py-1 text-white">
               {video.ageBadge}
