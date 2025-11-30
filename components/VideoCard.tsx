@@ -31,9 +31,10 @@ const VideoCard = ({ video, isFavorite = false, onToggleFavorite }: VideoCardPro
   const isVideoMedia = video.coverUrl.includes("Vidéo_IA") || video.coverUrl.includes("Video_IA");
   const coverImageUrl = getCloudinaryUrl(
     video.coverUrl,
-    isVideoMedia ? "video" : "image"
+    isVideoMedia ? "video" : "image",
+    isVideoMedia // Ajouter .jpg pour miniature vidéo seulement
   );
-  const videoPreviewUrl = video.videoUrl ? getCloudinaryUrl(video.videoUrl, "video") : null;
+  const videoPreviewUrl = video.videoUrl ? getCloudinaryUrl(video.videoUrl, "video", false) : null;
   const isLocalMedia = coverImageUrl.startsWith("/api/local-media");
 
   // Intersection Observer pour démarrer la vidéo quand visible à 50%

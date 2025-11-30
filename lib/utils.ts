@@ -44,10 +44,12 @@ export type VideoCardModel = {
  * Construit l'URL Cloudinary complète à partir du Public ID
  * @param publicId - Le Public ID Cloudinary (ex: "lustleak/media/Photo_IA/image")
  * @param resourceType - Type de ressource: "image" ou "video"
+ * @param asThumbnail - Pour les vidéos, ajouter .jpg pour obtenir une miniature
  */
 export const getCloudinaryUrl = (
   publicId: string,
-  resourceType: "image" | "video" = "image"
+  resourceType: "image" | "video" = "image",
+  asThumbnail: boolean = false
 ): string => {
   // En dev, utiliser l'API route local-media
   const useLocalMedia = process.env.NEXT_PUBLIC_USE_LOCAL_MEDIA === "true";
@@ -96,8 +98,8 @@ export const getCloudinaryUrl = (
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dbtuww2ie";
   const transformations = "q_auto,f_auto,w_800";
   
-  // Pour les vidéos, ajouter .jpg pour obtenir la miniature auto-générée
-  const suffix = resourceType === "video" ? ".jpg" : "";
+  // Pour les vidéos, ajouter .jpg uniquement si demandé (miniature)
+  const suffix = resourceType === "video" && asThumbnail ? ".jpg" : "";
   
   return `https://res.cloudinary.com/${cloudName}/${resourceType}/upload/${transformations}/${publicId}${suffix}`;
 };
