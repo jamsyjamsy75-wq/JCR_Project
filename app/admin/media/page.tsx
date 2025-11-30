@@ -227,7 +227,7 @@ export default function AdminMediaPage() {
                   type="file"
                   accept={formData.type === "video" ? "video/*" : "image/*"}
                   onChange={handleFileChange}
-                  className="w-full rounded border border-neon-pink/30 bg-night p-3 text-white file:mr-4 file:rounded file:border-0 file:bg-neon-pink/20 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-neon-pink hover:file:bg-neon-pink/30 focus:border-neon-pink focus:outline-none focus:ring-2 focus:ring-neon-pink/20"
+                  className="w-full rounded border border-neon-pink/30 bg-night p-3 text-white file:mr-4 file:rounded file:border-0 file:bg-neon-pink/20 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-neon-pink/30 focus:border-neon-pink focus:outline-none focus:ring-2 focus:ring-neon-pink/20"
                   required
                 />
               </div>
