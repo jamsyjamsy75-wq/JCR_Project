@@ -431,10 +431,15 @@ export default function AdminMediaPage() {
                     <td className="py-4">
                       <div className="relative h-16 w-24">
                         <Image
-                          src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/q_auto,f_auto,w_200/${media.coverUrl}`}
+                          src={
+                            media.type === "video"
+                              ? `https://res.cloudinary.com/dbtuww2ie/video/upload/q_auto,f_auto,w_200/${media.coverUrl}.jpg`
+                              : `https://res.cloudinary.com/dbtuww2ie/image/upload/q_auto,f_auto,w_200/${media.coverUrl}`
+                          }
                           alt={media.title}
                           fill
                           className="rounded object-cover"
+                          unoptimized
                         />
                       </div>
                     </td>

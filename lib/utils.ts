@@ -94,8 +94,8 @@ export const getCloudinaryUrl = (
   // En production, utiliser Cloudinary
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dbtuww2ie";
   const transformations = resourceType === "video" 
-    ? "q_auto,f_auto" 
-    : "q_auto,f_auto,w_800";
+    ? "ar_16:9,c_fill,q_auto,f_auto" 
+    : "ar_16:9,c_fill,q_auto,f_auto,w_800";
   
   return `https://res.cloudinary.com/${cloudName}/${resourceType}/upload/${transformations}/${publicId}`;
 };
