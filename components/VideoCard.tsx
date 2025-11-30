@@ -128,11 +128,13 @@ const VideoCard = ({ video, isFavorite = false, onToggleFavorite }: VideoCardPro
             </span>
           )}
         </div>
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 transition group-hover:opacity-100">
-          <span className="rounded-full border border-neon-pink px-5 py-2 text-xs font-semibold uppercase tracking-[0.5em] text-white shadow-glow">
-            ▶ play
-          </span>
-        </div>
+        {videoPreviewUrl && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 transition group-hover:opacity-100">
+            <span className="rounded-full border border-neon-pink px-5 py-2 text-xs font-semibold uppercase tracking-[0.5em] text-white shadow-glow">
+              ▶ play
+            </span>
+          </div>
+        )}
         <div className="absolute bottom-4 left-4 flex items-center gap-2 text-xs font-semibold text-white/80">
           <span className="rounded-full bg-black/60 px-3 py-1">
             {formatDuration(video.duration)}
