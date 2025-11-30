@@ -40,6 +40,11 @@ export default function AdminMediaPage() {
   // Formulaire d'upload
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [notification, setNotification] = useState<{
+    show: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({ show: false, message: "", type: "success" });
   const [formData, setFormData] = useState({
     title: "",
     type: "video",
@@ -92,6 +97,13 @@ export default function AdminMediaPage() {
     }
   };
 
+  const showNotification = (message: string, type: "success" | "error") => {
+    setNotification({ show: true, message, type });
+    setTimeout(() => {
+      setNotification({ show: false, message: "", type: "success" });
+    }, 3000);
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
@@ -101,7 +113,7 @@ export default function AdminMediaPage() {
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) {
-      alert("Veuillez sélectionner un fichier");
+      showNotification("Veuillez sélectionner un fichier", "error");
       return;
     }
 
@@ -139,7 +151,7 @@ export default function AdminMediaPage() {
 
       if (!createRes.ok) throw new Error("Erreur création média");
 
-      alert("Média uploadé avec succès !");
+      showNotification("✅ Média uploadé avec succès !", "success");
       
       // Reset form
       setFile(null);
@@ -156,7 +168,7 @@ export default function AdminMediaPage() {
       loadMedias();
     } catch (error) {
       console.error("Erreur:", error);
-      alert("Erreur lors de l'upload");
+      showNotification("❌ Erreur lors de l'upload", "error");
     } finally {
       setUploading(false);
     }
@@ -172,11 +184,11 @@ export default function AdminMediaPage() {
 
       if (!res.ok) throw new Error("Erreur suppression");
 
-      alert("Média supprimé !");
+      showNotification("✅ Média supprimé !", "success");
       loadMedias();
     } catch (error) {
       console.error("Erreur:", error);
-      alert("Erreur lors de la suppression");
+      showNotification("❌ Erreur lors de la suppression", "error");
     }
   };
 
@@ -190,6 +202,27 @@ export default function AdminMediaPage() {
 
   return (
     <div className="min-h-screen bg-night p-8">
+      {/* Notification Popup */}
+      {notification.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div
+            className={`animate-bounce-in rounded-lg border-2 px-8 py-6 shadow-2xl ${
+              notification.type === "success"
+                ? "border-neon-pink bg-gradient-to-br from-neon-pink/20 to-pink-500/10 shadow-neon-pink/50"
+                : "border-red-500 bg-gradient-to-br from-red-500/20 to-red-700/10 shadow-red-500/50"
+            }`}
+          >
+            <p
+              className={`text-center text-xl font-bold ${
+                notification.type === "success" ? "text-neon-pink" : "text-red-400"
+              }`}
+            >
+              {notification.message}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="mx-auto max-w-7xl">
         <h1 className="mb-8 text-3xl font-bold text-neon-pink">
           Back-Office - Gestion des Médias
