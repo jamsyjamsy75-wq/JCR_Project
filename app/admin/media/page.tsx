@@ -212,7 +212,7 @@ export default function AdminMediaPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, type: e.target.value })
                   }
-                  className="w-full rounded bg-night p-3 text-white"
+                  className="w-full rounded border border-neon-pink/30 bg-night p-3 text-white focus:border-neon-pink focus:outline-none focus:ring-2 focus:ring-neon-pink/20"
                 >
                   <option value="video">Vidéo</option>
                   <option value="photo">Photo</option>
@@ -227,7 +227,7 @@ export default function AdminMediaPage() {
                   type="file"
                   accept={formData.type === "video" ? "video/*" : "image/*"}
                   onChange={handleFileChange}
-                  className="w-full rounded bg-night p-3 text-white"
+                  className="w-full rounded border border-neon-pink/30 bg-night p-3 text-white file:mr-4 file:rounded file:border-0 file:bg-neon-pink/20 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-neon-pink hover:file:bg-neon-pink/30 focus:border-neon-pink focus:outline-none focus:ring-2 focus:ring-neon-pink/20"
                   required
                 />
               </div>
@@ -242,7 +242,7 @@ export default function AdminMediaPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, title: e.target.value })
                   }
-                  className="w-full rounded bg-night p-3 text-white"
+                  className="w-full rounded border border-neon-pink/30 bg-night p-3 text-white placeholder:text-white/30 focus:border-neon-pink focus:outline-none focus:ring-2 focus:ring-neon-pink/20"
                   required
                 />
               </div>
@@ -256,7 +256,7 @@ export default function AdminMediaPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, categoryId: e.target.value })
                   }
-                  className="w-full rounded bg-night p-3 text-white"
+                  className="w-full rounded border border-neon-pink/30 bg-night p-3 text-white focus:border-neon-pink focus:outline-none focus:ring-2 focus:ring-neon-pink/20"
                   required
                 >
                   <option value="">Sélectionner...</option>
@@ -278,7 +278,7 @@ export default function AdminMediaPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, performer: e.target.value })
                   }
-                  className="w-full rounded bg-night p-3 text-white"
+                  className="w-full rounded border border-neon-pink/30 bg-night p-3 text-white placeholder:text-white/30 focus:border-neon-pink focus:outline-none focus:ring-2 focus:ring-neon-pink/20"
                 />
               </div>
 
@@ -295,7 +295,7 @@ export default function AdminMediaPage() {
                       duration: parseInt(e.target.value),
                     })
                   }
-                  className="w-full rounded bg-night p-3 text-white"
+                  className="w-full rounded border border-neon-pink/30 bg-night p-3 text-white placeholder:text-white/30 focus:border-neon-pink focus:outline-none focus:ring-2 focus:ring-neon-pink/20"
                 />
               </div>
 
@@ -310,7 +310,7 @@ export default function AdminMediaPage() {
                     setFormData({ ...formData, ageBadge: e.target.value })
                   }
                   placeholder="18+, XR, 4K..."
-                  className="w-full rounded bg-night p-3 text-white"
+                  className="w-full rounded border border-neon-pink/30 bg-night p-3 text-white placeholder:text-white/30 focus:border-neon-pink focus:outline-none focus:ring-2 focus:ring-neon-pink/20"
                 />
               </div>
 
@@ -322,7 +322,7 @@ export default function AdminMediaPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, isHd: e.target.checked })
                   }
-                  className="mr-2"
+                  className="mr-2 h-5 w-5 rounded border-neon-pink/30 bg-night text-neon-pink focus:ring-2 focus:ring-neon-pink/20"
                 />
                 <label htmlFor="isHd" className="text-white/70">
                   HD
