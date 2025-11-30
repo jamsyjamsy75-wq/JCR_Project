@@ -3,7 +3,7 @@ import { PrismaLibSQL } from "@prisma/adapter-libsql";
 import { createClient } from "@libsql/client";
 import { mediaCategories, mediaVideos } from "../lib/mediaCatalog";
 
-function createPrismaClient() {
+export function createPrismaClient() {
   if (process.env.TURSO_DATABASE_URL && process.env.TURSO_AUTH_TOKEN) {
     const libsql = createClient({
       url: process.env.TURSO_DATABASE_URL,

@@ -23,6 +23,7 @@ model Category {
 model Video {
   id        String   @id
   title     String
+  type      String   @default("video") // "photo" ou "video"
   duration  Int
   views     Int      @default(0)
   isHd      Boolean  @default(false)

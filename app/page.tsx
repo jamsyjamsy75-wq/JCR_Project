@@ -12,6 +12,7 @@ import type { VideoCardModel } from "@/lib/utils";
 const HomePage = () => {
   const [filters, setFilters] = useState<string[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>("");
+  const [mediaType, setMediaType] = useState<string>("all"); // "all", "video", "photo"
   const [videos, setVideos] = useState<VideoCardModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,12 +59,15 @@ const HomePage = () => {
         setIsLoading(true);
         setError(null);
 
-        const params =
-          activeFilter && activeFilter !== "Trending"
-            ? new URLSearchParams({ category: activeFilter })
-            : null;
+        const params = new URLSearchParams();
+        if (activeFilter && activeFilter !== "Trending") {
+          params.set("category", activeFilter);
+        }
+        if (mediaType && mediaType !== "all") {
+          params.set("type", mediaType);
+        }
 
-        const url = params
+        const url = params.toString()
           ? `/api/videos?${params.toString()}`
           : "/api/videos";
 
@@ -89,7 +93,7 @@ const HomePage = () => {
     fetchVideos();
 
     return () => controller.abort();
-  }, [activeFilter]);
+  }, [activeFilter, mediaType]);
 
   return (
     <>
@@ -99,6 +103,40 @@ const HomePage = () => {
         <main className="pt-24">
           <HeroVideo />
           <section className="mx-auto max-w-7xl px-6 py-16" id="feed">
+            {/* Toggle Photo/Vidéo */}
+            <div className="mb-6 flex justify-center gap-3">
+              <button
+                onClick={() => setMediaType("all")}
+                className={`rounded-full px-8 py-3 font-semibold transition ${
+                  mediaType === "all"
+                    ? "bg-neon-pink text-white shadow-glow"
+                    : "bg-night-lighter text-white/60 hover:text-white"
+                }`}
+              >
+                Tous
+              </button>
+              <button
+                onClick={() => setMediaType("video")}
+                className={`rounded-full px-8 py-3 font-semibold transition ${
+                  mediaType === "video"
+                    ? "bg-neon-pink text-white shadow-glow"
+                    : "bg-night-lighter text-white/60 hover:text-white"
+                }`}
+              >
+                📹 Vidéos
+              </button>
+              <button
+                onClick={() => setMediaType("photo")}
+                className={`rounded-full px-8 py-3 font-semibold transition ${
+                  mediaType === "photo"
+                    ? "bg-neon-pink text-white shadow-glow"
+                    : "bg-night-lighter text-white/60 hover:text-white"
+                }`}
+              >
+                📷 Photos
+              </button>
+            </div>
+
             {filters.length > 0 ? (
               <FilterBar
                 filters={filters}

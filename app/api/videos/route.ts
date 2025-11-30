@@ -28,6 +28,7 @@ const filterFallbackVideos = (
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get("category");
+  const type = searchParams.get("type"); // "photo", "video" ou null
   const limitParam = searchParams.get("limit");
   const take = Math.min(Number(limitParam) || 50, 100);
 
@@ -54,17 +55,22 @@ export async function GET(request: Request) {
     });
 
   try {
-    const where =
-      category && category !== "all" && normalizedCategory !== "trending"
-        ? {
-            OR: [
-              { category: { name: category } },
-              ...(normalizedCategory
-                ? [{ category: { slug: normalizedCategory } }]
-                : []),
-            ],
-          }
-        : undefined;
+    const where: any = {};
+
+    // Filtre par catégorie
+    if (category && category !== "all" && normalizedCategory !== "trending") {
+      where.OR = [
+        { category: { name: category } },
+        ...(normalizedCategory
+          ? [{ category: { slug: normalizedCategory } }]
+          : []),
+      ];
+    }
+
+    // Filtre par type (photo/video)
+    if (type && ["photo", "video"].includes(type)) {
+      where.type = type;
+    }
 
     const [videos, total] = await Promise.all([
       prisma.video.findMany({
