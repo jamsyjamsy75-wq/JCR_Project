@@ -37,6 +37,7 @@ export type VideoCardModel = {
   videoUrl: string | null;
   performer: string;
   ageBadge: string | null;
+  type?: string;
 };
 
 /**
@@ -93,11 +94,12 @@ export const getCloudinaryUrl = (
   
   // En production, utiliser Cloudinary
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dbtuww2ie";
-  const transformations = resourceType === "video" 
-    ? "q_auto,f_auto" 
-    : "q_auto,f_auto,w_800";
+  const transformations = "q_auto,f_auto,w_800";
   
-  return `https://res.cloudinary.com/${cloudName}/${resourceType}/upload/${transformations}/${publicId}`;
+  // Pour les vidéos, ajouter .jpg pour obtenir la miniature auto-générée
+  const suffix = resourceType === "video" ? ".jpg" : "";
+  
+  return `https://res.cloudinary.com/${cloudName}/${resourceType}/upload/${transformations}/${publicId}${suffix}`;
 };
 
 
