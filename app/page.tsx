@@ -95,6 +95,17 @@ const HomePage = () => {
     return () => controller.abort();
   }, [activeFilter, mediaType]);
 
+  // Restaurer la position de scroll au retour
+  useEffect(() => {
+    const scrollPosition = sessionStorage.getItem('scrollPosition');
+    if (scrollPosition) {
+      setTimeout(() => {
+        window.scrollTo(0, parseInt(scrollPosition));
+        sessionStorage.removeItem('scrollPosition');
+      }, 100);
+    }
+  }, []);
+
   return (
     <>
       <AgeGateModal />

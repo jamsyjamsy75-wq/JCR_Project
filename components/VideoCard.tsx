@@ -76,8 +76,13 @@ const VideoCard = ({ video, isFavorite = false, onToggleFavorite }: VideoCardPro
     setIsLoading(false);
   };
 
+  const handleClick = () => {
+    // Sauvegarder la position de scroll avant de naviguer
+    sessionStorage.setItem('scrollPosition', window.scrollY.toString());
+  };
+
   return (
-    <Link href={`/video/${video.id}`} scroll={false}>
+    <Link href={`/video/${video.id}`} onClick={handleClick}>
       <article
         ref={cardRef}
         className="group relative mb-6 break-inside-avoid rounded-3xl border border-white/5 bg-gradient-to-b from-slate-850 to-obsidian shadow-[0_25px_60px_rgba(0,0,0,0.35)] transition hover:-translate-y-2 hover:border-neon-pink/40 hover:shadow-glow cursor-pointer"
