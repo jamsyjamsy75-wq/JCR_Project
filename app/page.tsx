@@ -12,7 +12,13 @@ import type { VideoCardModel } from "@/lib/utils";
 const HomePage = () => {
   const [filters, setFilters] = useState<string[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>("");
-  const [mediaType, setMediaType] = useState<string>("all"); // "all", "video", "photo"
+  const [mediaType, setMediaType] = useState<string>(() => {
+    // Restaurer le filtre si on revient d'une page détail
+    if (typeof window !== 'undefined' && sessionStorage.getItem('returnFromDetail')) {
+      return sessionStorage.getItem('savedMediaType') || 'all';
+    }
+    return 'all';
+  });
   const [videos, setVideos] = useState<VideoCardModel[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -98,10 +104,12 @@ const HomePage = () => {
   // Restaurer la position de scroll au retour
   useEffect(() => {
     const scrollPosition = sessionStorage.getItem('scrollPosition');
+    const returnFromDetail = sessionStorage.getItem('returnFromDetail');
     console.log('🔍 Checking scroll position:', scrollPosition);
     console.log('📦 Videos loaded:', videos.length);
+    console.log('🔙 Return from detail:', returnFromDetail);
     
-    if (scrollPosition && videos.length > 0) {
+    if (scrollPosition && returnFromDetail && videos.length > 0) {
       const position = parseInt(scrollPosition);
       console.log('🎯 Restoring scroll to:', position);
       
@@ -109,6 +117,7 @@ const HomePage = () => {
         window.scrollTo(0, position);
         console.log('✅ Scroll restored to:', window.scrollY);
         sessionStorage.removeItem('scrollPosition');
+        sessionStorage.removeItem('returnFromDetail');
       });
     }
   }, [videos]);
@@ -124,7 +133,10 @@ const HomePage = () => {
             {/* Toggle Photo/Vidéo */}
             <div className="mb-6 flex justify-center gap-3">
               <button
-                onClick={() => setMediaType("all")}
+                onClick={() => {
+                  setMediaType("all");
+                  sessionStorage.setItem('savedMediaType', 'all');
+                }}
                 className={`rounded-full px-8 py-3 font-semibold transition ${
                   mediaType === "all"
                     ? "bg-neon-pink text-white shadow-glow"
@@ -134,7 +146,10 @@ const HomePage = () => {
                 Tous
               </button>
               <button
-                onClick={() => setMediaType("video")}
+                onClick={() => {
+                  setMediaType("video");
+                  sessionStorage.setItem('savedMediaType', 'video');
+                }}
                 className={`rounded-full px-8 py-3 font-semibold transition ${
                   mediaType === "video"
                     ? "bg-neon-pink text-white shadow-glow"
@@ -144,7 +159,10 @@ const HomePage = () => {
                 📹 Vidéos
               </button>
               <button
-                onClick={() => setMediaType("photo")}
+                onClick={() => {
+                  setMediaType("photo");
+                  sessionStorage.setItem('savedMediaType', 'photo');
+                }}
                 className={`rounded-full px-8 py-3 font-semibold transition ${
                   mediaType === "photo"
                     ? "bg-neon-pink text-white shadow-glow"

@@ -81,6 +81,7 @@ const VideoCard = ({ video, isFavorite = false, onToggleFavorite }: VideoCardPro
     const scrollPos = window.scrollY;
     console.log('💾 Saving scroll position:', scrollPos);
     sessionStorage.setItem('scrollPosition', scrollPos.toString());
+    sessionStorage.setItem('returnFromDetail', 'true');
   };
 
   return (
