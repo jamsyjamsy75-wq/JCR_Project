@@ -28,6 +28,7 @@ export default function VideoDetailPage() {
   const [video, setVideo] = useState<VideoDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [showLightbox, setShowLightbox] = useState(false);
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -99,7 +100,11 @@ export default function VideoDetailPage() {
               poster={`https://res.cloudinary.com/dbtuww2ie/video/upload/q_auto,f_auto,w_1200/${video.coverUrl}.jpg`}
             />
           ) : (
-            <div className="relative aspect-video w-full">
+            <div 
+              className="relative aspect-video w-full cursor-zoom-in transition hover:opacity-90"
+              onClick={() => setShowLightbox(true)}
+              title="Cliquez pour agrandir"
+            >
               <Image
                 src={mediaUrl}
                 alt={video.title}
@@ -110,6 +115,38 @@ export default function VideoDetailPage() {
             </div>
           )}
         </div>
+
+        {/* Lightbox pour agrandir l'image */}
+        {!isVideo && showLightbox && (
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4"
+            onClick={() => setShowLightbox(false)}
+          >
+            {/* Bouton fermer */}
+            <button
+              onClick={() => setShowLightbox(false)}
+              className="absolute right-4 top-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-2xl text-white backdrop-blur-sm transition hover:bg-white/20 md:right-6 md:top-6"
+              aria-label="Fermer"
+            >
+              ✕
+            </button>
+
+            {/* Image agrandie */}
+            <div 
+              className="relative h-full w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src={`https://res.cloudinary.com/dbtuww2ie/image/upload/q_auto,f_auto/${video.coverUrl}`}
+                alt={video.title}
+                fill
+                className="object-contain"
+                unoptimized
+                quality={100}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Informations */}
         <div className="space-y-6">
