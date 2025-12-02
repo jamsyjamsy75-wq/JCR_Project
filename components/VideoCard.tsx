@@ -78,9 +78,10 @@ const VideoCard = ({ video, isFavorite = false, onToggleFavorite }: VideoCardPro
   return (
     <article
       ref={cardRef}
-      className="group relative mb-6 break-inside-avoid rounded-3xl border border-white/5 bg-gradient-to-b from-slate-850 to-obsidian shadow-[0_25px_60px_rgba(0,0,0,0.35)] transition hover:-translate-y-2 hover:border-neon-pink/40 hover:shadow-glow"
+      className="group relative mb-6 break-inside-avoid rounded-3xl border border-white/5 bg-gradient-to-b from-slate-850 to-obsidian shadow-[0_25px_60px_rgba(0,0,0,0.35)] transition hover:-translate-y-2 hover:border-neon-pink/40 hover:shadow-glow cursor-pointer"
       onMouseEnter={handlePreviewStart}
       onMouseLeave={handlePreviewStop}
+      onClick={() => window.location.href = `/video/${video.id}`}
     >
       <div className="relative overflow-hidden rounded-t-3xl">
         {isLocalMedia ? (
