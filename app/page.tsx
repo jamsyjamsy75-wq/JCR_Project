@@ -7,6 +7,7 @@ import FilterBar from "@/components/FilterBar";
 import VideoGrid from "@/components/VideoGrid";
 import AgeGateModal from "@/components/AgeGateModal";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 import type { VideoCardModel } from "@/lib/utils";
 
 const HomePage = () => {
@@ -205,6 +206,7 @@ const HomePage = () => {
           </section>
         </main>
         <Footer />
+        <ScrollToTop />
       </div>
     </>
   );
