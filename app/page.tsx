@@ -98,9 +98,16 @@ const HomePage = () => {
   // Restaurer la position de scroll au retour
   useEffect(() => {
     const scrollPosition = sessionStorage.getItem('scrollPosition');
+    console.log('🔍 Checking scroll position:', scrollPosition);
+    console.log('📦 Videos loaded:', videos.length);
+    
     if (scrollPosition && videos.length > 0) {
+      const position = parseInt(scrollPosition);
+      console.log('🎯 Restoring scroll to:', position);
+      
       requestAnimationFrame(() => {
-        window.scrollTo(0, parseInt(scrollPosition));
+        window.scrollTo(0, position);
+        console.log('✅ Scroll restored to:', window.scrollY);
         sessionStorage.removeItem('scrollPosition');
       });
     }
