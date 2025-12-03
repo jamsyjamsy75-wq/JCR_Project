@@ -43,9 +43,6 @@ export default async function ProfilePage() {
   });
 
   // Récupérer les images générées par l'utilisateur
-  // TODO: Réactiver après migration production avec createdBy
-  const generatedImages: any[] = [];
-  /*
   const generatedImages = await prisma.video.findMany({
     where: { 
       createdBy: session.user.id,
@@ -57,7 +54,6 @@ export default async function ProfilePage() {
     orderBy: { createdAt: "desc" },
     take: 12,
   });
-  */
 
   const favoriteVideos = favorites.map((fav) => ({
     id: fav.video.id,

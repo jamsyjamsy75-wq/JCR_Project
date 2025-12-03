@@ -68,9 +68,9 @@ export async function GET(request: Request) {
     });
 
   try {
-    const where: any = {};
-    // TODO: Réactiver isPublic après migration production
-    // isPublic: true,
+    const where: any = {
+      isPublic: true, // Afficher uniquement les vidéos publiques sur l'accueil
+    };
 
     // Filtre par catégorie
     if (category && category !== "all" && normalizedCategory !== "trending") {
