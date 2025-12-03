@@ -18,7 +18,7 @@ export default function GenerateImagePage() {
   const [negativePrompt, setNegativePrompt] = useState("ugly, blurry, low quality, distorted, deformed");
   const [width, setWidth] = useState(1024);
   const [height, setHeight] = useState(1024);
-  const [model, setModel] = useState<"schnell" | "dev">("dev"); // dev = meilleure qualité
+  const [model, setModel] = useState<"schnell" | "dev" | "sd15">("dev"); // dev = meilleure qualité
   const [numSteps, setNumSteps] = useState(25); // 25 par défaut pour dev
   const [loading, setLoading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<GeneratedImage | null>(null);
@@ -241,18 +241,25 @@ export default function GenerateImagePage() {
               {/* Dimensions */}
               {/* Modèle */}
               <div className="mb-4">
-                <label className="mb-2 block text-sm font-medium">Modèle FLUX</label>
+                <label className="mb-2 block text-sm font-medium">Modèle IA</label>
                 <select
                   value={model}
                   onChange={(e) => {
-                    const newModel = e.target.value as "schnell" | "dev";
+                    const newModel = e.target.value as "schnell" | "dev" | "sd15";
                     setModel(newModel);
-                    setNumSteps(newModel === "schnell" ? 4 : 25);
+                    if (newModel === "schnell") {
+                      setNumSteps(4);
+                    } else if (newModel === "sd15") {
+                      setNumSteps(30);
+                    } else {
+                      setNumSteps(25);
+                    }
                   }}
                   className="w-full rounded-lg border border-white/20 bg-obsidian p-3 text-white focus:border-neon-pink focus:outline-none"
                 >
                   <option value="dev">FLUX.1-dev (Meilleure qualité, ~30-60s)</option>
                   <option value="schnell">FLUX.1-schnell (Rapide, ~10-20s)</option>
+                  <option value="sd15">Stable Diffusion 1.5 (Classique, ~20-40s)</option>
                 </select>
               </div>
 
@@ -263,8 +270,8 @@ export default function GenerateImagePage() {
                 </label>
                 <input
                   type="range"
-                  min={model === "schnell" ? 1 : 10}
-                  max={model === "schnell" ? 8 : 50}
+                  min={model === "schnell" ? 1 : model === "sd15" ? 20 : 10}
+                  max={model === "schnell" ? 8 : model === "sd15" ? 50 : 50}
                   value={numSteps}
                   onChange={(e) => setNumSteps(Number(e.target.value))}
                   className="w-full"
@@ -313,7 +320,7 @@ export default function GenerateImagePage() {
 
               {/* Info */}
               <p className="mt-4 text-xs text-white/60">
-                🆓 100% Gratuit • {model === "dev" ? "⏱️ ~30-60s" : "⚡ ~10-20s"} • 🔞 NSFW OK
+                🆓 100% Gratuit • {model === "dev" ? "⏱️ ~30-60s" : model === "sd15" ? "⏱️ ~20-40s" : "⚡ ~10-20s"} • 🔞 NSFW OK
               </p>
 
               {/* Retry info */}
