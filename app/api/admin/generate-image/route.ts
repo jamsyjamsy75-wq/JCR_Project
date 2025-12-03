@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { InferenceClient } from "@huggingface/inference";
 
-// Forcer Node.js runtime (Hugging Face nécessite Node.js, pas Edge)
+// Forcer Node.js runtime
 export const runtime = "nodejs";
 export const maxDuration = 60; // 60 secondes max pour la génération
 
@@ -33,57 +32,47 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Token Hugging Face (100% GRATUIT)
-    const HF_TOKEN = process.env.HUGGING_FACE_TOKEN;
-    
-    if (!HF_TOKEN) {
-      console.error('❌ HUGGING_FACE_TOKEN manquant');
-      return NextResponse.json(
-        { error: "Token Hugging Face manquant dans .env" },
-        { status: 500 }
-      );
-    }
-
     // Choisir le modèle FLUX selon la préférence
-    const modelName = model === "dev" 
-      ? "black-forest-labs/FLUX.1-dev"     // Meilleure qualité
-      : "black-forest-labs/FLUX.1-schnell"; // Plus rapide
+    // flux-pro = FLUX.1-dev (meilleure qualité)
+    // flux = FLUX.1-schnell (rapide)
+    const pollinationsModel = model === "dev" ? "flux-pro" : "flux";
 
-    console.log(`🎨 Génération avec ${modelName} (${numSteps} steps)...`);
+    console.log(`🎨 Génération avec Pollinations.ai (${pollinationsModel})...`);
 
-    // Utiliser InferenceClient comme dans la doc officielle
-    const client = new InferenceClient(HF_TOKEN);
+    // Pollinations.ai - 100% gratuit, illimité, utilise FLUX
+    // API: https://image.pollinations.ai/prompt/{prompt}?model={model}&width={width}&height={height}
+    const encodedPrompt = encodeURIComponent(prompt);
+    const encodedNegative = negativePrompt ? encodeURIComponent(negativePrompt) : "";
     
-    console.log(`📡 Appel avec InferenceClient.textToImage()`);
+    let apiUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=${pollinationsModel}&width=${width}&height=${height}&nologo=true&enhance=true`;
     
-    // Utiliser textToImage avec les paramètres corrects selon la doc
-    const imageBlob = await client.textToImage({
-      model: modelName,
-      inputs: prompt,
-      parameters: {
-        negative_prompt: negativePrompt || "",
-        width: width,
-        height: height,
-        num_inference_steps: numSteps,
-      },
+    if (encodedNegative) {
+      apiUrl += `&negative=${encodedNegative}`;
+    }
+    
+    console.log(`📡 Appel Pollinations API...`);
+    
+    const response = await fetch(apiUrl, {
+      method: "GET",
     });
 
-    console.log("📦 Type de résultat:", typeof imageBlob, imageBlob?.constructor?.name);
+    if (!response.ok) {
+      throw new Error(`Pollinations API error: ${response.status}`);
+    }
 
-    // Convertir le Blob en base64
-    const arrayBuffer = await (imageBlob as any).arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const imageBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(imageBuffer);
     const base64Image = buffer.toString('base64');
     const dataUrl = `data:image/png;base64,${base64Image}`;
 
-    console.log(`✅ Image générée avec succès (${modelName}, ${numSteps} steps)`);
+    console.log(`✅ Image générée avec succès (${pollinationsModel})`);
 
     return NextResponse.json({
       success: true,
       image: dataUrl,
       prompt,
       negativePrompt,
-      model: modelName,
+      model: pollinationsModel,
       steps: numSteps,
     });
 
