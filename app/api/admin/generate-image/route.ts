@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { HfInference } from "@huggingface/inference";
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +13,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { prompt, negativePrompt, width, height } = await request.json();
+    const { 
+      prompt, 
+      negativePrompt, 
+      width = 1024, 
+      height = 1024,
+      model = "dev", // "dev" ou "schnell"
+      numSteps = 25
+    } = await request.json();
 
     if (!prompt) {
       return NextResponse.json(
@@ -21,73 +29,63 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Token Hugging Face (gratuit) - à ajouter dans .env
+    // Token Hugging Face (100% GRATUIT)
     const HF_TOKEN = process.env.HUGGING_FACE_TOKEN;
     
     if (!HF_TOKEN) {
+      console.error('❌ HUGGING_FACE_TOKEN manquant');
       return NextResponse.json(
-        { error: "HUGGING_FACE_TOKEN manquant dans .env" },
+        { error: "Token Hugging Face manquant dans .env" },
         { status: 500 }
       );
     }
 
-    // Appeler Hugging Face Inference API
-    // Modèle : Stable Diffusion XL (officiel, NSFW autorisé)
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${HF_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          inputs: prompt,
-          parameters: {
-            negative_prompt: negativePrompt || "ugly, blurry, low quality, distorted",
-            width: width || 1024,
-            height: height || 1024,
-            num_inference_steps: 30,
-            guidance_scale: 7.5,
-          },
-        }),
-      }
-    );
+    // Choisir le modèle FLUX selon la préférence
+    const modelName = model === "dev" 
+      ? "black-forest-labs/FLUX.1-dev"    // Meilleure qualité
+      : "black-forest-labs/FLUX.1-schnell"; // Plus rapide
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error("Hugging Face error:", error);
-      
-      // Si le modèle est en train de charger
-      if (response.status === 503) {
-        return NextResponse.json(
-          { 
-            error: "Le modèle est en cours de chargement. Réessayez dans 20 secondes.",
-            retryAfter: 20 
-          },
-          { status: 503 }
-        );
-      }
-      
-      return NextResponse.json(
-        { error: "Erreur lors de la génération" },
-        { status: response.status }
-      );
+    console.log(`🎨 Génération avec ${modelName} (${numSteps} steps)...`);
+
+    // Utiliser le client officiel @huggingface/inference
+    const hf = new HfInference(HF_TOKEN);
+    
+    // textToImage avec paramètres personnalisés
+    const result: any = await hf.textToImage({
+      model: modelName,
+      inputs: prompt,
+      parameters: {
+        negative_prompt: negativePrompt || "",
+        width: width,
+        height: height,
+        num_inference_steps: numSteps,
+      },
+    });
+
+    console.log("📦 Type de résultat:", typeof result, result?.constructor?.name);
+
+    // Le résultat devrait être un Blob
+    let dataUrl: string;
+    if (result && typeof result.arrayBuffer === 'function') {
+      // C'est un Blob
+      const arrayBuffer = await result.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const base64Image = buffer.toString('base64');
+      dataUrl = `data:image/png;base64,${base64Image}`;
+    } else {
+      // Déjà une string (URL ou base64)
+      dataUrl = result.toString();
     }
 
-    // Récupérer l'image (blob)
-    const imageBlob = await response.blob();
-    
-    // Convertir en base64 pour l'envoyer au client
-    const buffer = Buffer.from(await imageBlob.arrayBuffer());
-    const base64Image = buffer.toString('base64');
-    const dataUrl = `data:image/jpeg;base64,${base64Image}`;
+    console.log(`✅ Image générée avec succès (${modelName}, ${numSteps} steps)`);
 
     return NextResponse.json({
       success: true,
       image: dataUrl,
       prompt,
       negativePrompt,
+      model: modelName,
+      steps: numSteps,
     });
 
   } catch (error) {

@@ -18,6 +18,8 @@ export default function GenerateImagePage() {
   const [negativePrompt, setNegativePrompt] = useState("ugly, blurry, low quality, distorted, deformed");
   const [width, setWidth] = useState(1024);
   const [height, setHeight] = useState(1024);
+  const [model, setModel] = useState<"schnell" | "dev">("dev"); // dev = meilleure qualité
+  const [numSteps, setNumSteps] = useState(25); // 25 par défaut pour dev
   const [loading, setLoading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<GeneratedImage | null>(null);
   const [error, setError] = useState("");
@@ -81,6 +83,8 @@ export default function GenerateImagePage() {
           negativePrompt,
           width,
           height,
+          model,
+          numSteps,
         }),
       });
 
@@ -198,6 +202,42 @@ export default function GenerateImagePage() {
               </div>
 
               {/* Dimensions */}
+              {/* Modèle */}
+              <div className="mb-4">
+                <label className="mb-2 block text-sm font-medium">Modèle FLUX</label>
+                <select
+                  value={model}
+                  onChange={(e) => {
+                    const newModel = e.target.value as "schnell" | "dev";
+                    setModel(newModel);
+                    setNumSteps(newModel === "schnell" ? 4 : 25);
+                  }}
+                  className="w-full rounded-lg border border-white/20 bg-obsidian p-3 text-white focus:border-neon-pink focus:outline-none"
+                >
+                  <option value="dev">FLUX.1-dev (Meilleure qualité, ~30-60s)</option>
+                  <option value="schnell">FLUX.1-schnell (Rapide, ~10-20s)</option>
+                </select>
+              </div>
+
+              {/* Steps */}
+              <div className="mb-4">
+                <label className="mb-2 block text-sm font-medium">
+                  Nombre de steps ({numSteps}) - Plus = meilleure qualité mais plus lent
+                </label>
+                <input
+                  type="range"
+                  min={model === "schnell" ? 1 : 10}
+                  max={model === "schnell" ? 8 : 50}
+                  value={numSteps}
+                  onChange={(e) => setNumSteps(Number(e.target.value))}
+                  className="w-full"
+                />
+                <div className="mt-1 flex justify-between text-xs text-white/50">
+                  <span>Rapide</span>
+                  <span>Qualité</span>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-2 block text-sm font-medium">Largeur</label>
@@ -236,7 +276,7 @@ export default function GenerateImagePage() {
 
               {/* Info */}
               <p className="mt-4 text-xs text-white/60">
-                🆓 Gratuit via Hugging Face • ⏱️ 30-60 secondes • 🔞 NSFW autorisé
+                🆓 100% Gratuit • {model === "dev" ? "⏱️ ~30-60s" : "⚡ ~10-20s"} • 🔞 NSFW OK
               </p>
 
               {/* Retry info */}
