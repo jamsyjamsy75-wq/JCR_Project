@@ -42,6 +42,19 @@ export default async function ProfilePage() {
     distinct: ["videoId"],
   });
 
+  // Récupérer les images générées par l'utilisateur
+  const generatedImages = await prisma.video.findMany({
+    where: { 
+      createdBy: session.user.id,
+      type: "photo"
+    },
+    include: {
+      category: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take: 12,
+  });
+
   const favoriteVideos = favorites.map((fav) => ({
     id: fav.video.id,
     title: fav.video.title,
@@ -66,6 +79,19 @@ export default async function ProfilePage() {
     videoUrl: view.video.videoUrl,
     performer: view.video.performer,
     ageBadge: view.video.ageBadge,
+  }));
+
+  const myGeneratedImages = generatedImages.map((img) => ({
+    id: img.id,
+    title: img.title,
+    category: img.category.name,
+    duration: img.duration,
+    views: img.views,
+    isHd: img.isHd,
+    coverUrl: img.coverUrl,
+    videoUrl: img.videoUrl,
+    performer: img.performer,
+    ageBadge: img.ageBadge,
   }));
 
   return (
@@ -120,9 +146,55 @@ export default async function ProfilePage() {
                     {favorites.length} favoris • {recentViews.length} vues
                   </span>
                 </div>
+                <div className="mt-6">
+                  <Link
+                    href="/admin/generate"
+                    className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-glow transition hover:scale-105 hover:shadow-purple-500/50"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                    </svg>
+                    ✨ Generate Image IA
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
+
+          {/* Generated Images Section */}
+          <section className="mt-16">
+            <div className="mb-8 flex items-center justify-between">
+              <h2 className="font-display text-3xl uppercase tracking-[0.3em] text-white">
+                ✨ Mes Images Générées
+              </h2>
+              <Link
+                href="/admin/generate"
+                className="rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-5 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-glow transition hover:scale-105"
+              >
+                + Créer
+              </Link>
+            </div>
+            {myGeneratedImages.length > 0 ? (
+              <div className="columns-1 gap-6 sm:columns-2 lg:columns-3 xl:columns-4">
+                {myGeneratedImages.map((img) => (
+                  <VideoCard key={img.id} video={img} />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-900/20 to-pink-900/20 p-12 text-center">
+                <p className="mb-2 text-4xl">🎨</p>
+                <p className="text-white/60">
+                  Vous n&apos;avez pas encore créé d&apos;images avec l&apos;IA.
+                </p>
+                <Link
+                  href="/admin/generate"
+                  className="mt-4 inline-block rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-glow transition hover:scale-105"
+                >
+                  ✨ Générer ma première image
+                </Link>
+              </div>
+            )}
+          </section>
 
           {/* Favorites Section */}
           <section className="mt-16">

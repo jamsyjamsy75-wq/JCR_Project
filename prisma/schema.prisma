@@ -33,11 +33,15 @@ model Video {
   ageBadge  String?
   category  Category @relation(fields: [categoryId], references: [id])
   categoryId Int
+  createdBy String?  // ID de l'utilisateur qui a créé (pour images IA)
+  creator   User?    @relation("CreatedVideos", fields: [createdBy], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
   favorites Favorite[]
   videoViews VideoView[]
+  
+  @@index([createdBy])
 }
 
 model User {
@@ -55,6 +59,7 @@ model User {
   accounts      Account[]
   favorites     Favorite[]
   videoViews    VideoView[]
+  createdVideos Video[]   @relation("CreatedVideos")
 }
 
 model Session {

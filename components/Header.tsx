@@ -56,6 +56,12 @@ const Header = () => {
           ) : session ? (
             <>
               <Link
+                href="/admin/generate"
+                className="rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-5 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-glow transition hover:scale-105"
+              >
+                ✨ Generate
+              </Link>
+              <Link
                 href="/profile"
                 className="flex items-center gap-2 rounded-full border border-white/20 px-5 py-2 text-sm font-semibold uppercase tracking-[0.25em] text-white transition hover:border-neon-pink hover:text-neon-pink hover:shadow-glow"
               >
@@ -135,6 +141,13 @@ const Header = () => {
               <div className="h-10 animate-pulse rounded-full bg-white/10" />
             ) : session ? (
               <>
+                <Link
+                  href="/admin/generate"
+                  onClick={closeMenu}
+                  className="rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 text-center text-sm font-semibold uppercase tracking-[0.25em] text-white shadow-glow transition hover:scale-105"
+                >
+                  ✨ Generate Image IA
+                </Link>
                 <Link
                   href="/profile"
                   onClick={closeMenu}
