@@ -33,6 +33,7 @@ export default function GenerateImagePage() {
     title: "",
     performer: "",
     categoryId: "",
+    showOnHome: true, // Par défaut, afficher sur l'accueil
   });
 
   // Notification popup
@@ -145,6 +146,7 @@ export default function GenerateImagePage() {
           title: saveForm.title,
           performer: saveForm.performer,
           categoryId: saveForm.categoryId,
+          showOnHome: saveForm.showOnHome,
         }),
       });
 
@@ -158,7 +160,7 @@ export default function GenerateImagePage() {
       // Succès !
       showNotification("✅ Image sauvegardée avec succès !", "success");
       setShowSaveModal(false);
-      setSaveForm({ title: "", performer: "", categoryId: "" });
+      setSaveForm({ title: "", performer: "", categoryId: "", showOnHome: true });
       setGeneratedImage(null);
 
     } catch (err) {
@@ -413,7 +415,7 @@ export default function GenerateImagePage() {
               />
             </div>
 
-            <div className="mb-6">
+            <div className="mb-4">
               <label className="mb-2 block text-sm font-medium">
                 Catégorie <span className="text-red-500">*</span>
               </label>
@@ -429,6 +431,23 @@ export default function GenerateImagePage() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div className="mb-6">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={saveForm.showOnHome}
+                  onChange={(e) => setSaveForm({ ...saveForm, showOnHome: e.target.checked })}
+                  className="h-5 w-5 cursor-pointer rounded border-white/20 bg-obsidian text-neon-pink focus:ring-2 focus:ring-neon-pink focus:ring-offset-0"
+                />
+                <span className="text-sm font-medium">
+                  🏠 Afficher sur la page d&apos;accueil
+                </span>
+              </label>
+              <p className="mt-1 ml-8 text-xs text-white/50">
+                Si décoché, l&apos;image sera visible uniquement dans votre profil
+              </p>
             </div>
 
             <div className="flex gap-3">

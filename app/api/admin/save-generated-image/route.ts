@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { image, title, performer, categoryId } = await request.json();
+    const { image, title, performer, categoryId, showOnHome = true } = await request.json();
 
     if (!image || !title || !performer || !categoryId) {
       return NextResponse.json(
@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
         views: 0,
         ageBadge: "18+",
         createdBy: session.user.id, // Enregistrer le créateur
+        isPublic: showOnHome, // Afficher sur l'accueil ou non
       },
     });
 
