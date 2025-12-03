@@ -56,35 +56,43 @@ export async function POST(request: NextRequest) {
 
     console.log(`🎨 Génération avec ${modelName} (${numSteps} steps)...`);
 
-    // Utiliser le client officiel @huggingface/inference
-    const hf = new HfInference(HF_TOKEN);
+    // Utiliser l'API Inference directe (pas de providers, vraiment gratuit)
+    const apiUrl = `https://api-inference.huggingface.co/models/${modelName}`;
     
-    // textToImage avec paramètres personnalisés
-    const result: any = await hf.textToImage({
-      model: modelName,
-      inputs: prompt,
-      parameters: {
-        negative_prompt: negativePrompt || "",
-        width: width,
-        height: height,
-        num_inference_steps: numSteps,
+    console.log(`📡 Appel direct API: ${apiUrl}`);
+    
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${HF_TOKEN}`,
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        inputs: prompt,
+        parameters: {
+          negative_prompt: negativePrompt || "",
+          width: width,
+          height: height,
+          num_inference_steps: numSteps,
+        },
+      }),
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`❌ Erreur API HF (${response.status}):`, errorText);
+      throw new Error(`Hugging Face API error: ${response.status} - ${errorText}`);
+    }
+
+    const result = await response.blob();
 
     console.log("📦 Type de résultat:", typeof result, result?.constructor?.name);
 
-    // Le résultat devrait être un Blob
-    let dataUrl: string;
-    if (result && typeof result.arrayBuffer === 'function') {
-      // C'est un Blob
-      const arrayBuffer = await result.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      const base64Image = buffer.toString('base64');
-      dataUrl = `data:image/png;base64,${base64Image}`;
-    } else {
-      // Déjà une string (URL ou base64)
-      dataUrl = result.toString();
-    }
+    // Convertir le Blob en base64
+    const arrayBuffer = await result.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const base64Image = buffer.toString('base64');
+    const dataUrl = `data:image/png;base64,${base64Image}`;
 
     console.log(`✅ Image générée avec succès (${modelName}, ${numSteps} steps)`);
 
