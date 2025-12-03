@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -44,7 +44,7 @@ export default function GenerateImagePage() {
   }>({ show: false, message: "", type: "success" });
 
   // Charger les catégories
-  useState(() => {
+  useEffect(() => {
     const loadCategories = async () => {
       try {
         const res = await fetch("/api/categories");
@@ -55,7 +55,7 @@ export default function GenerateImagePage() {
       }
     };
     loadCategories();
-  });
+  }, []);
 
   // Rediriger si pas admin
   if (status === "loading") {
