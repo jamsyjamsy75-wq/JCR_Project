@@ -29,8 +29,9 @@ TURSO_AUTH_TOKEN=<voir .env.local>
 ```
 HUGGING_FACE_TOKEN=<voir .env.local>
 ```
+⚠️ **CRITIQUE** : Sans cette variable, le générateur d'images retourne une erreur 500 !
 
-📝 **Note** : Toutes les valeurs réelles sont dans ton fichier `.env.local` (non versionné pour la sécurité)
+📝 **Note** : Les autres valeurs réelles sont dans ton fichier `.env.local` (non versionné pour la sécurité)
 
 ### 5️⃣ **Configuration média**
 ```
@@ -41,12 +42,26 @@ NEXT_PUBLIC_USE_LOCAL_MEDIA=false
 
 ## 📋 Checklist de déploiement
 
-1. ✅ Code pushé sur GitHub (commit `11af984`)
-2. ⬜ Ajouter TOUTES les variables d'environnement ci-dessus sur Vercel
-3. ⬜ Vérifier que `AUTH_URL` correspond à ton URL Vercel
-4. ⬜ Redéployer le projet après avoir ajouté les variables
-5. ⬜ Tester la génération d'image sur la version en ligne
-6. ⬜ Tester la sauvegarde d'image générée
+1. ✅ Code pushé sur GitHub
+2. ⬜ **[URGENT]** Ajouter `HUGGING_FACE_TOKEN` sur Vercel (générateur d'images ne fonctionne pas sans ça !)
+3. ⬜ Ajouter toutes les autres variables d'environnement ci-dessus sur Vercel
+4. ⬜ Vérifier que `AUTH_URL` correspond à ton URL Vercel
+5. ⬜ Redéployer le projet après avoir ajouté les variables
+6. ⬜ Tester la génération d'image sur https://project-xburncrust.vercel.app/admin/generate
+7. ⬜ Tester la sauvegarde d'image générée
+
+---
+
+## 🚨 Erreur 500 sur `/api/admin/generate-image` ?
+
+**Cause probable :** `HUGGING_FACE_TOKEN` manquant sur Vercel
+
+**Solution :**
+1. Vercel Dashboard → Votre projet → Settings → Environment Variables
+2. Add New → `HUGGING_FACE_TOKEN` = `<votre token depuis .env.local>`
+3. Cochez : Production + Preview + Development
+4. Save
+5. Deployments → Redeploy
 
 ---
 

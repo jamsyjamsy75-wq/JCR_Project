@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
         duration: 0,
         views: 0,
         ageBadge: "18+",
-        createdBy: session.user.id, // Enregistrer le créateur
+        createdBy: (session.user as any).id, // Enregistrer le créateur
         isPublic: showOnHome, // Afficher sur l'accueil ou non
       },
     });

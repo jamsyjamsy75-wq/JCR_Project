@@ -93,10 +93,24 @@ export async function POST(request: NextRequest) {
       steps: numSteps,
     });
 
-  } catch (error) {
-    console.error("Erreur génération image:", error);
+  } catch (error: any) {
+    console.error("❌ Erreur génération image:", error);
+    console.error("❌ Message:", error?.message);
+    console.error("❌ Stack:", error?.stack);
+    console.error("❌ Response:", error?.response?.data);
+    
+    // Retourner des détails pour debug
     return NextResponse.json(
-      { error: "Erreur serveur lors de la génération" },
+      { 
+        error: "Erreur serveur lors de la génération",
+        details: error?.message || "Erreur inconnue",
+        type: error?.constructor?.name,
+        // En dev, on retourne plus d'infos
+        ...(process.env.NODE_ENV === 'development' && { 
+          stack: error?.stack,
+          full: JSON.stringify(error, null, 2)
+        })
+      },
       { status: 500 }
     );
   }
