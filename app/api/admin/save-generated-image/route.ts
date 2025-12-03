@@ -24,24 +24,34 @@ export async function POST(request: NextRequest) {
 
     // Extraire les données de l'image base64
     const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
-    const buffer = Buffer.from(base64Data, "base64");
 
-    // Upload vers Cloudinary
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+    // Upload vers Cloudinary avec API authentifiée
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    const apiKey = process.env.CLOUDINARY_API_KEY;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
-    if (!cloudName || !uploadPreset) {
+    if (!cloudName || !apiKey || !apiSecret) {
+      console.error("Configuration Cloudinary manquante:", { cloudName: !!cloudName, apiKey: !!apiKey, apiSecret: !!apiSecret });
       return NextResponse.json(
         { error: "Configuration Cloudinary manquante" },
         { status: 500 }
       );
     }
 
+    // Créer la signature pour l'upload authentifié
+    const timestamp = Math.round(Date.now() / 1000);
+    const crypto = await import('crypto');
+    
+    const paramsToSign = `folder=Photo_IA&timestamp=${timestamp}${apiSecret}`;
+    const signature = crypto.createHash('sha1').update(paramsToSign).digest('hex');
+
     // Créer un FormData pour l'upload
     const formData = new FormData();
-    formData.append("file", `data:image/jpeg;base64,${base64Data}`);
-    formData.append("upload_preset", uploadPreset);
-    formData.append("folder", "Photo_IA"); // Dossier pour les images générées par IA
+    formData.append("file", `data:image/png;base64,${base64Data}`);
+    formData.append("folder", "Photo_IA");
+    formData.append("timestamp", timestamp.toString());
+    formData.append("api_key", apiKey);
+    formData.append("signature", signature);
 
     const cloudinaryResponse = await fetch(
       `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
@@ -90,8 +100,18 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error("Erreur sauvegarde image:", error);
+    
+    // Log plus détaillé pour le débogage
+    if (error instanceof Error) {
+      console.error("Message d'erreur:", error.message);
+      console.error("Stack trace:", error.stack);
+    }
+    
     return NextResponse.json(
-      { error: "Erreur serveur lors de la sauvegarde" },
+      { 
+        error: "Erreur serveur lors de la sauvegarde",
+        details: error instanceof Error ? error.message : "Erreur inconnue"
+      },
       { status: 500 }
     );
   }
