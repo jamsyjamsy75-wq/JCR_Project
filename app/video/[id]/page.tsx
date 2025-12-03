@@ -22,6 +22,62 @@ type VideoDetail = {
   createdAt: string;
 };
 
+// Fonction pour détecter les bots
+const isBot = (): boolean => {
+  if (typeof window === "undefined") return true;
+  
+  const userAgent = navigator.userAgent.toLowerCase();
+  const botPatterns = [
+    'bot', 'crawler', 'spider', 'crawling', 'google', 'bing', 'yahoo',
+    'baidu', 'duckduck', 'yandex', 'slurp', 'facebook', 'twitter'
+  ];
+  
+  // Vérifier si c'est un bot connu
+  if (botPatterns.some(pattern => userAgent.includes(pattern))) {
+    return true;
+  }
+  
+  // Vérifier si c'est un navigateur automatisé (Selenium, Puppeteer, etc.)
+  if (navigator.webdriver) {
+    return true;
+  }
+  
+  return false;
+};
+
+// Fonction pour vérifier si la vidéo a déjà été vue dans les dernières 24h
+const hasRecentlyViewed = (videoId: string): boolean => {
+  try {
+    const viewedVideos = localStorage.getItem('viewedVideos');
+    if (!viewedVideos) return false;
+    
+    const parsed = JSON.parse(viewedVideos);
+    const lastView = parsed[videoId];
+    
+    if (!lastView) return false;
+    
+    const now = Date.now();
+    const hoursSinceView = (now - lastView) / (1000 * 60 * 60);
+    
+    // Si vu il y a moins de 24h
+    return hoursSinceView < 24;
+  } catch {
+    return false;
+  }
+};
+
+// Fonction pour enregistrer la vue
+const recordView = (videoId: string) => {
+  try {
+    const viewedVideos = localStorage.getItem('viewedVideos');
+    const parsed = viewedVideos ? JSON.parse(viewedVideos) : {};
+    parsed[videoId] = Date.now();
+    localStorage.setItem('viewedVideos', JSON.stringify(parsed));
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde de la vue:', error);
+  }
+};
+
 export default function VideoDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -48,6 +104,49 @@ export default function VideoDetailPage() {
       fetchVideo();
     }
   }, [params.id]);
+
+  // Système de vues avec protection anti-spam
+  useEffect(() => {
+    if (!video || !params.id) return;
+    
+    const videoId = params.id as string;
+    
+    // Vérifier si c'est un bot
+    if (isBot()) {
+      console.log('🤖 Bot détecté - vue non comptée');
+      return;
+    }
+    
+    // Vérifier si déjà vu récemment
+    if (hasRecentlyViewed(videoId)) {
+      console.log('👁️ Déjà vu dans les 24h - vue non comptée');
+      return;
+    }
+    
+    // Attendre 1 seconde avant de compter la vue
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/videos/${videoId}/increment-view`, {
+          method: 'POST',
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          console.log('✅ Vue comptée:', data.views);
+          
+          // Enregistrer dans localStorage
+          recordView(videoId);
+          
+          // Mettre à jour le compteur local
+          setVideo(prev => prev ? { ...prev, views: data.views } : null);
+        }
+      } catch (error) {
+        console.error('Erreur lors de l\'incrémentation:', error);
+      }
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, [video, params.id]);
 
   if (loading) {
     return (
