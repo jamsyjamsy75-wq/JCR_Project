@@ -14,6 +14,7 @@ export type MediaVideo = {
   videoUrl: string | null;
   performer: string;
   ageBadge: string | null;
+  type?: "photo" | "video"; // Ajouté pour le filtrage
 };
 
 export const mediaCategories: MediaCategory[] = [
@@ -57,6 +58,7 @@ const trendingPhotos: MediaVideo[] = [
     videoUrl: null,
     performer: "XBURN Studio",
     ageBadge: null,
+    type: "photo",
   },
   {
     id: "trend-photo-02",

@@ -7,22 +7,34 @@ import {
 
 const filterFallbackVideos = (
   category?: string | null,
-  slug?: string | null
+  slug?: string | null,
+  type?: string | null
 ) => {
+  let filtered = mediaVideos;
+
+  // Filtre par catégorie
   if (
-    !category ||
-    category === "all" ||
-    category === "Trending" ||
-    slug === "trending"
+    category &&
+    category !== "all" &&
+    category !== "Trending" &&
+    slug !== "trending"
   ) {
-    return mediaVideos;
+    filtered = filtered.filter((video) => {
+      if (video.category === category) return true;
+      const videoSlug = normalizeCategorySlug(video.category);
+      return !!slug && videoSlug === slug;
+    });
   }
 
-  return mediaVideos.filter((video) => {
-    if (video.category === category) return true;
-    const videoSlug = normalizeCategorySlug(video.category);
-    return !!slug && videoSlug === slug;
-  });
+  // Filtre par type (photo/video)
+  if (type && ["photo", "video"].includes(type)) {
+    filtered = filtered.filter((video) => {
+      const videoType = video.videoUrl ? "video" : "photo";
+      return videoType === type;
+    });
+  }
+
+  return filtered;
 };
 
 export async function GET(request: Request) {
@@ -47,6 +59,7 @@ export async function GET(request: Request) {
         videoUrl: video.videoUrl,
         performer: video.performer,
         ageBadge: video.ageBadge,
+        type: video.videoUrl ? "video" : "photo",
       })),
       meta: {
         total: videos.length,
@@ -85,7 +98,7 @@ export async function GET(request: Request) {
     ]);
 
     if (!videos.length) {
-      const fallbackList = filterFallbackVideos(category, normalizedCategory);
+      const fallbackList = filterFallbackVideos(category, normalizedCategory, type);
       return buildResponse(fallbackList, true);
     }
 
@@ -101,6 +114,7 @@ export async function GET(request: Request) {
         videoUrl: video.videoUrl,
         performer: video.performer,
         ageBadge: video.ageBadge,
+        type: video.type,
       })),
       meta: {
         total,
@@ -108,7 +122,7 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error("[GET /api/videos]", error);
-    const fallbackList = filterFallbackVideos(category, normalizedCategory);
+    const fallbackList = filterFallbackVideos(category, normalizedCategory, type);
     return buildResponse(fallbackList, true);
   }
 }
