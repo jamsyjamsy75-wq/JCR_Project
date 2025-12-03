@@ -228,12 +228,20 @@ export default function AdminMediaPage() {
           <h1 className="text-3xl font-bold text-neon-pink">
             Back-Office - Gestion des Médias
           </h1>
-          <button
-            onClick={() => router.push("/")}
-            className="rounded-lg bg-night-lighter px-4 py-2 text-white transition hover:bg-neon-pink"
-          >
-            ← Retour à l&apos;accueil
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => router.push("/admin/generate")}
+              className="rounded-lg bg-purple-600 px-4 py-2 text-white transition hover:bg-purple-700"
+            >
+              ✨ Générer avec IA
+            </button>
+            <button
+              onClick={() => router.push("/")}
+              className="rounded-lg bg-night-lighter px-4 py-2 text-white transition hover:bg-neon-pink"
+            >
+              ← Retour à l&apos;accueil
+            </button>
+          </div>
         </div>
 
         {/* Formulaire d'upload */}
