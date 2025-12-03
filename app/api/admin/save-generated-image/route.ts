@@ -56,7 +56,8 @@ export async function POST(request: NextRequest) {
     // Générer un ID unique pour la vidéo
     const videoId = `ai-gen-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-    // Sauvegarder en base de données avec le créateur
+    // Sauvegarder en base de données
+    // TODO: Rajouter createdBy et isPublic après migration production
     const video = await prisma.video.create({
       data: {
         id: videoId,
@@ -69,8 +70,8 @@ export async function POST(request: NextRequest) {
         duration: 0,
         views: 0,
         ageBadge: "18+",
-        createdBy: session.user.id, // Enregistrer le créateur
-        isPublic: showOnHome, // Afficher sur l'accueil ou non
+        // createdBy: session.user.id, // TODO: Réactiver après migration
+        // isPublic: showOnHome, // TODO: Réactiver après migration
       },
     });
 
