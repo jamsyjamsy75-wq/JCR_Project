@@ -35,6 +35,13 @@ export default function GenerateImagePage() {
     categoryId: "",
   });
 
+  // Notification popup
+  const [notification, setNotification] = useState<{
+    show: boolean;
+    message: string;
+    type: "success" | "error";
+  }>({ show: false, message: "", type: "success" });
+
   // Charger les catégories
   useState(() => {
     const loadCategories = async () => {
@@ -109,6 +116,13 @@ export default function GenerateImagePage() {
     }
   };
 
+  const showNotification = (message: string, type: "success" | "error") => {
+    setNotification({ show: true, message, type });
+    setTimeout(() => {
+      setNotification({ show: false, message: "", type: "success" });
+    }, 3000);
+  };
+
   const handleSaveToMedia = () => {
     setShowSaveModal(true);
   };
@@ -142,7 +156,7 @@ export default function GenerateImagePage() {
       }
 
       // Succès !
-      alert("✅ Image sauvegardée avec succès !");
+      showNotification("✅ Image sauvegardée avec succès !", "success");
       setShowSaveModal(false);
       setSaveForm({ title: "", performer: "", categoryId: "" });
       setGeneratedImage(null);
@@ -157,6 +171,27 @@ export default function GenerateImagePage() {
 
   return (
     <div className="min-h-screen bg-obsidian text-white">
+      {/* Notification Popup */}
+      {notification.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div
+            className={`animate-bounce-in rounded-lg border-2 px-8 py-6 shadow-2xl ${
+              notification.type === "success"
+                ? "border-neon-pink bg-gradient-to-br from-neon-pink/20 to-pink-500/10 shadow-neon-pink/50"
+                : "border-red-500 bg-gradient-to-br from-red-500/20 to-red-700/10 shadow-red-500/50"
+            }`}
+          >
+            <p
+              className={`text-center text-xl font-bold ${
+                notification.type === "success" ? "text-neon-pink" : "text-red-400"
+              }`}
+            >
+              {notification.message}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="mx-auto max-w-7xl px-6 py-12">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
