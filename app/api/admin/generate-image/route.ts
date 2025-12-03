@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { HfInference } from "@huggingface/inference";
+import { InferenceClient } from "@huggingface/inference";
 
 // Forcer Node.js runtime (Hugging Face nécessite Node.js, pas Edge)
 export const runtime = "nodejs";
@@ -51,41 +51,27 @@ export async function POST(request: NextRequest) {
 
     console.log(`🎨 Génération avec ${modelName} (${numSteps} steps)...`);
 
-    // Utiliser l'API Inference directe (pas de providers, vraiment gratuit)
-    // NOUVELLE URL depuis décembre 2024
-    const apiUrl = `https://router.huggingface.co/models/${modelName}`;
+    // Utiliser InferenceClient comme dans la doc officielle
+    const client = new InferenceClient(HF_TOKEN);
     
-    console.log(`📡 Appel direct API: ${apiUrl}`);
+    console.log(`📡 Appel avec InferenceClient.textToImage()`);
     
-    const response = await fetch(apiUrl, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${HF_TOKEN}`,
-        "Content-Type": "application/json",
+    // Utiliser textToImage avec les paramètres corrects selon la doc
+    const imageBlob = await client.textToImage({
+      model: modelName,
+      inputs: prompt,
+      parameters: {
+        negative_prompt: negativePrompt || "",
+        width: width,
+        height: height,
+        num_inference_steps: numSteps,
       },
-      body: JSON.stringify({
-        inputs: prompt,
-        parameters: {
-          negative_prompt: negativePrompt || "",
-          width: width,
-          height: height,
-          num_inference_steps: numSteps,
-        },
-      }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`❌ Erreur API HF (${response.status}):`, errorText);
-      throw new Error(`Hugging Face API error: ${response.status} - ${errorText}`);
-    }
-
-    const result = await response.blob();
-
-    console.log("📦 Type de résultat:", typeof result, result?.constructor?.name);
+    console.log("📦 Type de résultat:", typeof imageBlob, imageBlob?.constructor?.name);
 
     // Convertir le Blob en base64
-    const arrayBuffer = await result.arrayBuffer();
+    const arrayBuffer = await (imageBlob as any).arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const base64Image = buffer.toString('base64');
     const dataUrl = `data:image/png;base64,${base64Image}`;
