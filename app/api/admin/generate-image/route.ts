@@ -52,7 +52,8 @@ export async function POST(request: NextRequest) {
     console.log(`🎨 Génération avec ${modelName} (${numSteps} steps)...`);
 
     // Utiliser l'API Inference directe (pas de providers, vraiment gratuit)
-    const apiUrl = `https://api-inference.huggingface.co/models/${modelName}`;
+    // NOUVELLE URL depuis décembre 2024
+    const apiUrl = `https://router.huggingface.co/models/${modelName}`;
     
     console.log(`📡 Appel direct API: ${apiUrl}`);
     
