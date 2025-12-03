@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
+import { v2 as cloudinary } from "cloudinary";
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,10 +23,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Extraire les données de l'image base64
-    const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
-
-    // Upload vers Cloudinary avec API authentifiée
+    // Configuration Cloudinary
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     const apiKey = process.env.CLOUDINARY_API_KEY;
     const apiSecret = process.env.CLOUDINARY_API_SECRET;
@@ -38,40 +36,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Créer la signature pour l'upload authentifié
-    const timestamp = Math.round(Date.now() / 1000);
-    const crypto = await import('crypto');
-    
-    const paramsToSign = `folder=Photo_IA&timestamp=${timestamp}${apiSecret}`;
-    const signature = crypto.createHash('sha1').update(paramsToSign).digest('hex');
+    // Configurer Cloudinary
+    cloudinary.config({
+      cloud_name: cloudName,
+      api_key: apiKey,
+      api_secret: apiSecret,
+    });
 
-    // Créer un FormData pour l'upload
-    const formData = new FormData();
-    formData.append("file", `data:image/png;base64,${base64Data}`);
-    formData.append("folder", "Photo_IA");
-    formData.append("timestamp", timestamp.toString());
-    formData.append("api_key", apiKey);
-    formData.append("signature", signature);
+    // Upload vers Cloudinary en utilisant le SDK
+    console.log("🚀 Upload vers Cloudinary...");
+    const uploadResult = await cloudinary.uploader.upload(image, {
+      folder: "Photo_IA",
+      resource_type: "image",
+    });
 
-    const cloudinaryResponse = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-
-    if (!cloudinaryResponse.ok) {
-      const error = await cloudinaryResponse.text();
-      console.error("Cloudinary upload error:", error);
-      return NextResponse.json(
-        { error: "Erreur lors de l'upload vers Cloudinary" },
-        { status: 500 }
-      );
-    }
-
-    const cloudinaryData = await cloudinaryResponse.json();
-    const publicId = cloudinaryData.public_id;
+    console.log("✅ Upload réussi:", uploadResult.public_id);
+    const publicId = uploadResult.public_id;
 
     // Générer un ID unique pour la vidéo
     const videoId = `ai-gen-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -95,7 +75,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       video,
-      cloudinaryUrl: cloudinaryData.secure_url,
+      cloudinaryUrl: uploadResult.secure_url,
     });
 
   } catch (error) {
