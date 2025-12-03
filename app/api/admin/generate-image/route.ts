@@ -32,9 +32,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Appeler Hugging Face Inference API
-    // Modèle : Juggernaut XL v8 (excellent pour NSFW)
+    // Modèle : Stable Diffusion XL (officiel, NSFW autorisé)
     const response = await fetch(
-      "https://api-inference.huggingface.co/models/stablediffusionapi/juggernaut-xl-v8",
+      "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
       {
         method: "POST",
         headers: {
