@@ -44,15 +44,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Choisir le modèle selon la préférence
-    let modelName: string;
-    if (model === "dev") {
-      modelName = "black-forest-labs/FLUX.1-dev"; // Meilleure qualité
-    } else if (model === "sd15") {
-      modelName = "runwayml/stable-diffusion-v1-5"; // Stable Diffusion 1.5
-    } else {
-      modelName = "black-forest-labs/FLUX.1-schnell"; // Plus rapide
-    }
+    // Choisir le modèle FLUX selon la préférence
+    const modelName = model === "dev" 
+      ? "black-forest-labs/FLUX.1-dev"     // Meilleure qualité
+      : "black-forest-labs/FLUX.1-schnell"; // Plus rapide
 
     console.log(`🎨 Génération avec ${modelName} (${numSteps} steps)...`);
 
