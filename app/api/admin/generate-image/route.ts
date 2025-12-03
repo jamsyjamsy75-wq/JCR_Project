@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { HfInference } from "@huggingface/inference";
 
+// Forcer Node.js runtime (Hugging Face nécessite Node.js, pas Edge)
+export const runtime = "nodejs";
+export const maxDuration = 60; // 60 secondes max pour la génération
+
 export async function POST(request: NextRequest) {
   try {
     // Vérifier l'authentification admin
