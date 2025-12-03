@@ -58,16 +58,53 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Vérifier si la vidéo existe
-    const video = await prisma.video.findUnique({
+    // Vérifier si la vidéo existe en DB
+    let video = await prisma.video.findUnique({
       where: { id: videoId },
     });
 
+    // Si pas en DB, créer depuis le catalogue
     if (!video) {
-      return NextResponse.json(
-        { error: "Video not found" },
-        { status: 404 }
-      );
+      const { mediaVideos } = await import("@/lib/mediaCatalog");
+      const catalogVideo = mediaVideos.find((v) => v.id === videoId);
+      
+      if (catalogVideo) {
+        // Trouver ou créer la catégorie
+        let category = await prisma.category.findFirst({
+          where: { name: catalogVideo.category },
+        });
+        
+        if (!category) {
+          category = await prisma.category.create({
+            data: {
+              name: catalogVideo.category,
+              slug: catalogVideo.category.toLowerCase(),
+            },
+          });
+        }
+        
+        // Créer la vidéo en DB
+        video = await prisma.video.create({
+          data: {
+            id: catalogVideo.id,
+            title: catalogVideo.title,
+            type: catalogVideo.videoUrl ? "video" : "photo",
+            duration: catalogVideo.duration,
+            views: catalogVideo.views,
+            isHd: catalogVideo.isHd,
+            coverUrl: catalogVideo.coverUrl,
+            videoUrl: catalogVideo.videoUrl,
+            performer: catalogVideo.performer,
+            ageBadge: catalogVideo.ageBadge,
+            categoryId: category.id,
+          },
+        });
+      } else {
+        return NextResponse.json(
+          { error: "Video not found" },
+          { status: 404 }
+        );
+      }
     }
 
     // Vérifier si déjà en favoris
