@@ -44,13 +44,16 @@ export async function POST(request: NextRequest) {
     const encodedPrompt = encodeURIComponent(prompt);
     const encodedNegative = negativePrompt ? encodeURIComponent(negativePrompt) : "";
     
-    let apiUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=${pollinationsModel}&width=${width}&height=${height}&nologo=true&enhance=true`;
+    // Ajouter un seed aléatoire pour éviter le cache et générer une nouvelle image à chaque fois
+    const randomSeed = Math.floor(Math.random() * 1000000);
+    
+    let apiUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=${pollinationsModel}&width=${width}&height=${height}&seed=${randomSeed}&nologo=true&enhance=true`;
     
     if (encodedNegative) {
       apiUrl += `&negative=${encodedNegative}`;
     }
     
-    console.log(`📡 Appel Pollinations API...`);
+    console.log(`📡 Appel Pollinations API (seed: ${randomSeed})...`);
     
     const response = await fetch(apiUrl, {
       method: "GET",
