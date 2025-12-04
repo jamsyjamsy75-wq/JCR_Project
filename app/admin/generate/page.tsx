@@ -109,6 +109,9 @@ export default function GenerateImagePage() {
       }
 
       setGeneratedImage(data);
+      
+      // Afficher une notification avec le modèle utilisé
+      showNotification(`✅ Image générée avec ${data.model}`, "success");
     } catch (err) {
       setError("Erreur réseau lors de la génération");
       console.error(err);

@@ -32,50 +32,75 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Choisir le modèle FLUX selon la préférence
-    // flux-pro = FLUX.1-dev (meilleure qualité)
-    // flux = FLUX.1-schnell (rapide)
-    const pollinationsModel = model === "dev" ? "flux-pro" : "flux";
+    // Liste des 5 meilleurs modèles gratuits (par ordre de priorité)
+    const availableModels = [
+      { id: "flux-pro", name: "FLUX.1-dev", description: "Meilleure qualité" },
+      { id: "flux", name: "FLUX.1-schnell", description: "Rapide" },
+      { id: "turbo", name: "Stable Diffusion XL Turbo", description: "Très rapide" },
+      { id: "playground-v2.5", name: "Playground v2.5", description: "Excellent pour portraits" },
+      { id: "dreamshaper-xl", name: "Dreamshaper XL", description: "Bon compromis" },
+    ];
 
-    console.log(`🎨 Génération avec Pollinations.ai (${pollinationsModel})...`);
+    console.log(`🎨 Tentative de génération avec ${availableModels.length} modèles disponibles...`);
 
-    // Pollinations.ai - 100% gratuit, illimité, utilise FLUX
-    // API: https://image.pollinations.ai/prompt/{prompt}?model={model}&width={width}&height={height}
     const encodedPrompt = encodeURIComponent(prompt);
     const encodedNegative = negativePrompt ? encodeURIComponent(negativePrompt) : "";
-    
-    // Ajouter un seed aléatoire pour éviter le cache et générer une nouvelle image à chaque fois
     const randomSeed = Math.floor(Math.random() * 1000000);
-    
-    let apiUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=${pollinationsModel}&width=${width}&height=${height}&seed=${randomSeed}&nologo=true&enhance=true`;
-    
-    if (encodedNegative) {
-      apiUrl += `&negative=${encodedNegative}`;
-    }
-    
-    console.log(`📡 Appel Pollinations API (seed: ${randomSeed})...`);
-    
-    const response = await fetch(apiUrl, {
-      method: "GET",
-    });
 
-    if (!response.ok) {
-      throw new Error(`Pollinations API error: ${response.status}`);
+    let lastError = null;
+    let successModel = null;
+    let imageBuffer = null;
+
+    // Essayer chaque modèle un par un jusqu'à ce qu'un fonctionne
+    for (const modelInfo of availableModels) {
+      try {
+        console.log(`📡 Essai avec ${modelInfo.name} (${modelInfo.id})...`);
+        
+        let apiUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=${modelInfo.id}&width=${width}&height=${height}&seed=${randomSeed}&nologo=true&enhance=true`;
+        
+        if (encodedNegative) {
+          apiUrl += `&negative=${encodedNegative}`;
+        }
+        
+        const response = await fetch(apiUrl, {
+          method: "GET",
+          signal: AbortSignal.timeout(30000), // Timeout 30s
+        });
+
+        if (response.ok) {
+          imageBuffer = await response.arrayBuffer();
+          successModel = modelInfo;
+          console.log(`✅ Succès avec ${modelInfo.name} !`);
+          break; // Sortir de la boucle si succès
+        } else {
+          console.log(`⚠️ ${modelInfo.name} a échoué (${response.status}), passage au suivant...`);
+          lastError = `HTTP ${response.status}`;
+        }
+      } catch (error: any) {
+        console.log(`⚠️ ${modelInfo.name} a échoué (${error.message}), passage au suivant...`);
+        lastError = error.message;
+        continue; // Essayer le modèle suivant
+      }
     }
 
-    const imageBuffer = await response.arrayBuffer();
+    // Si aucun modèle n'a fonctionné
+    if (!imageBuffer || !successModel) {
+      throw new Error(`Tous les modèles ont échoué. Dernière erreur: ${lastError}`);
+    }
+
     const buffer = Buffer.from(imageBuffer);
     const base64Image = buffer.toString('base64');
     const dataUrl = `data:image/png;base64,${base64Image}`;
 
-    console.log(`✅ Image générée avec succès (${pollinationsModel})`);
+    console.log(`✅ Image générée avec succès avec ${successModel.name}`);
 
     return NextResponse.json({
       success: true,
       image: dataUrl,
       prompt,
       negativePrompt,
-      model: pollinationsModel,
+      model: successModel.name, // Retourner le nom du modèle qui a fonctionné
+      modelId: successModel.id,
       steps: numSteps,
     });
 
