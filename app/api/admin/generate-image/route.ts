@@ -21,8 +21,7 @@ export async function POST(request: NextRequest) {
       negativePrompt, 
       width = 1024, 
       height = 1024,
-      model = "dev", // "dev" ou "schnell"
-      numSteps = 25
+      numSteps = 25,
     } = await request.json();
 
     if (!prompt) {

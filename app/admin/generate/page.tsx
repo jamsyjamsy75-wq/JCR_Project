@@ -18,8 +18,7 @@ export default function GenerateImagePage() {
   const [negativePrompt, setNegativePrompt] = useState("ugly, blurry, low quality, distorted, deformed");
   const [width, setWidth] = useState(1024);
   const [height, setHeight] = useState(1024);
-  const [model, setModel] = useState<"schnell" | "dev">("dev"); // dev = meilleure qualité
-  const [numSteps, setNumSteps] = useState(25); // 25 par défaut pour dev
+  const [numSteps, setNumSteps] = useState(25); // Steps pour affiner la qualité
   const [loading, setLoading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<GeneratedImage | null>(null);
   const [error, setError] = useState("");
@@ -91,7 +90,6 @@ export default function GenerateImagePage() {
           negativePrompt,
           width,
           height,
-          model,
           numSteps,
         }),
       });
@@ -241,43 +239,40 @@ export default function GenerateImagePage() {
                 />
               </div>
 
-              {/* Dimensions */}
-              {/* Modèle */}
-              <div className="mb-4">
-                <label className="mb-2 block text-sm font-medium">Modèle IA</label>
-                <select
-                  value={model}
-                  onChange={(e) => {
-                    const newModel = e.target.value as "schnell" | "dev";
-                    setModel(newModel);
-                    setNumSteps(newModel === "schnell" ? 4 : 25);
-                  }}
-                  className="w-full rounded-lg border border-white/20 bg-obsidian p-3 text-white focus:border-neon-pink focus:outline-none"
-                >
-                  <option value="dev">FLUX.1-dev (Meilleure qualité, ~30-60s)</option>
-                  <option value="schnell">FLUX.1-schnell (Rapide, ~10-20s)</option>
-                </select>
+              {/* Info automatique */}
+              <div className="mb-4 rounded-lg border border-neon-pink/20 bg-neon-pink/5 p-4">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">🤖</span>
+                  <div className="text-sm">
+                    <p className="font-medium text-neon-pink">Sélection automatique du meilleur modèle</p>
+                    <p className="mt-1 text-white/70">
+                      Le système essaie automatiquement 5 modèles IA différents (FLUX.1-dev, FLUX.1-schnell, SD XL Turbo, Playground v2.5, Dreamshaper XL) pour garantir la meilleure qualité disponible.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Steps */}
               <div className="mb-4">
                 <label className="mb-2 block text-sm font-medium">
-                  Nombre de steps ({numSteps}) - Plus = meilleure qualité mais plus lent
+                  Qualité de génération ({numSteps} steps) - Plus = meilleure qualité mais plus lent
                 </label>
                 <input
                   type="range"
-                  min={model === "schnell" ? 1 : 10}
-                  max={model === "schnell" ? 8 : 50}
+                  min={5}
+                  max={50}
                   value={numSteps}
                   onChange={(e) => setNumSteps(Number(e.target.value))}
                   className="w-full"
                 />
                 <div className="mt-1 flex justify-between text-xs text-white/50">
-                  <span>Rapide</span>
-                  <span>Qualité</span>
+                  <span>Rapide (5)</span>
+                  <span>Équilibré (25)</span>
+                  <span>Max qualité (50)</span>
                 </div>
               </div>
 
+              {/* Dimensions */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-2 block text-sm font-medium">Largeur</label>
@@ -316,7 +311,7 @@ export default function GenerateImagePage() {
 
               {/* Info */}
               <p className="mt-4 text-xs text-white/60">
-                🆓 100% Gratuit • {model === "dev" ? "⏱️ ~30-60s" : "⚡ ~10-20s"} • 🔞 NSFW OK
+                🆓 100% Gratuit • ⏱️ ~10-60s (selon modèle) • 🔞 NSFW OK
               </p>
 
               {/* Retry info */}
